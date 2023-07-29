@@ -52,16 +52,11 @@ class S3SyncAddon extends GFAddOn {
 
 
 	/**
-	 * Configures the settings which should be rendered on the add-on settings tab.
+	 * Configures the settings which should be rendered on the add-on settings tab.Global Settings Area
 	 *
 	 * @return array
 	 */
-	/**
-	 * Configures the settings which should be rendered on the add-on settings tab.
-	 *
-	 * @return array
-	 */
-	public function plugin_settings_fields() {
+	public function plugin_settings_fields2() {
 		return array(
 			array(
 				'title'  => esc_html__( 'SyncS3 Settings', 'syncs3' ),
@@ -115,13 +110,14 @@ class S3SyncAddon extends GFAddOn {
 						'type' => 'text',
 						'class' => 'large'
 					),
-					array(
-						'name' => 'syncs3_license_key',
-						'tooltip' => esc_html__( 'Your SyncS3 License Key.', 'syncs3' ),
-						'label' => esc_html__( 'License Key', 'syncs3' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
+// array(
+//     'name' => 'syncs3_license_key',
+//     'tooltip' => esc_html__( 'Your SyncS3 License Key.', 'syncs3' ),
+//     'label' => esc_html__( 'License Key', 'syncs3' ),
+//     'type' => 'text',
+//     'class' => 'large'
+// ),
+
 				)
 			)
 		);
@@ -198,13 +194,6 @@ class S3SyncAddon extends GFAddOn {
 	 * @param  int 	$form_id  	Form ID
 	 *
 	 * @return void
-	 */	/**
-	 * Adds custom settings to the field's Advanced tab
-	 *
-	 * @param  int 	$position 	Position
-	 * @param  int 	$form_id  	Form ID
-	 *
-	 * @return void
 	 */
 	public function upload_field_settings( $position, $form_id ) {
 		
@@ -249,11 +238,13 @@ class S3SyncAddon extends GFAddOn {
 					</label>
 				</li>
 				<li class="amazons3_access_key_setting field_setting">
-					<input type="text" value="" id="field_amazons3_access_key" size="35" onchange="SetFieldProperty('amazonS3AccessKeyField', this.value);" />
+				
+					
 					<label for="field_amazons3_access_key" class="section_label">
 						<?php esc_html_e( 'Access Key', 'syncs3' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_access_key' ) ?>
 					</label>
+					<input type="text" value="" id="field_amazons3_access_key" size="35" onchange="SetFieldProperty('amazonS3AccessKeyField', this.value);" />
 					
 				</li>
 				<li class="amazons3_secret_key_setting field_setting">

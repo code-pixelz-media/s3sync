@@ -3,7 +3,8 @@ use Aws\S3\S3Client;
 
 GFForms::include_addon_framework();
 
-require_once('helpers.php');
+// require_once('helpers.php');
+
 
 class S3SyncAddon extends GFAddOn {
 

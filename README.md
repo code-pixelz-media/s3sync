@@ -1,2 +1,2 @@
 # s3sync
-Gravity form addon to upload file to Amazon s3.
+Gravity form addon to upload files to Amazon s3 and remove them from the server.

@@ -8,10 +8,10 @@ use Aws\S3\S3Client;
  *
  * @return object 	S3Client
  */
-function syncs3_s3_client( $config, $entry = '' ) {
+function s3sync_s3_client( $config, $entry = '' ) {
 	S3Sync::autoload();
 	$client = new S3Client( $config );
-	return apply_filters( 'syncs3_s3_client', $client, $config, $entry );
+	return apply_filters( 's3sync_s3_client', $client, $config, $entry );
 }
 
 /**
@@ -24,7 +24,7 @@ function syncs3_s3_client( $config, $entry = '' ) {
  *
  * @return mixed 	Boolean (false if no files in entry, true if upload is successful), or WP_Error if problem updating entry
  */
-function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unlink = false ) {
+function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unlink = false ) {
 
 	// Each form has its own upload path and URL
 	$upload_path = GFFormsModel::get_upload_path( $form_id );
@@ -65,9 +65,9 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	 * @param array 	$client_config 		Config data
 	 * @param array 	$entry 				Entry data
 	 */
-	$client_config = apply_filters( 'syncs3_send_entry_files_s3_client_config', $client_config, $entry );
+	$client_config = apply_filters( 's3sync_send_entry_files_s3_client_config', $client_config, $entry );
 
-	$s3 = syncs3_s3_client( $client_config, $entry );
+	$s3 = s3sync_s3_client( $client_config, $entry );
 
 	/**
 	 * Files to upload to Amazon S3.
@@ -78,7 +78,7 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	 * @param array 	$entry 			Entry data
 	 * @param int 		$form_id 		ID of the form
 	 */
-	$files = apply_filters( 'syncs3_entry_files', $files, $entry, $form_id );
+	$files = apply_filters( 's3sync_entry_files', $files, $entry, $form_id );
 
 	/**
 	 * Before files are uploaded to Amazon S3.
@@ -89,7 +89,7 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	 * @param int 		$form_id 		ID of the form
 	 * @param array 	$files 			Files to upload
 	 */
-	do_action( 'syncs3_before_entry_upload_to_s3', $entry, $form_id, $files );
+	do_action( 's3sync_before_entry_upload_to_s3', $entry, $form_id, $files );
 
 	foreach ( $files as $file ) {
 		
@@ -112,7 +112,7 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param int 		$form_id 		ID of the form
 		 * @param array 	$entry 			Entry data
 		 */
-		$bucket_name = apply_filters( 'syncs3_put_object_bucket_name', $keys['bucket_name'], $file, $file_name, $field_id, $form_id, $entry );
+		$bucket_name = apply_filters( 's3sync_put_object_bucket_name', $keys['bucket_name'], $file, $file_name, $field_id, $form_id, $entry );
 
 		/**
 		 * File path relative to the bucket.
@@ -126,7 +126,7 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param int 		$form_id 		ID of the form
 		 * @param array 	$entry 			Entry data
 		 */
-		$object_path = apply_filters( 'syncs3_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
+		$object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 
 		/**
 		 * Privacy setting for the file.
@@ -141,12 +141,12 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param int 		$form_id 		ID of the form
 		 * @param array 	$entry 			Entry data
 		 */
-		$acl = apply_filters( 'syncs3_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
+		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
 
 		// Send the file to S3 bucket
 		// https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		try {
-			$args = apply_filters( 'syncs3_putobject_args', array(
+			$args = apply_filters( 's3sync_putobject_args', array(
 				'Bucket' 		=> $bucket_name,
 				'Key'    		=> $object_path,
 				'ContentLength' => filesize( $file_path ),
@@ -196,7 +196,7 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	 * @param array 	$files 			Files to upload
 	 * @param array 	$s3_urls 		Array of S3 URLs
 	 */
-	do_action( 'syncs3_after_entry_upload_to_s3', $entry, $form_id, $files, $s3_urls );
+	do_action( 's3sync_after_entry_upload_to_s3', $entry, $form_id, $files, $s3_urls );
 
 	// Store the S3 URLs as entry meta
 	return gform_update_meta( $entry['id'], 's3_urls', array_replace( $existing_urls, $s3_urls ) );
@@ -212,19 +212,19 @@ function syncs3_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
  *
  * @return string   Access key
  */
-function syncs3_get_aws_identity_pool_id( $form = array(), $field = false ) {
+function s3sync_get_aws_identity_pool_id( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_key = ! empty( $settings['amazons3_identity_pool_id'] ) ? $settings['amazons3_identity_pool_id'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_key = ! empty( $form_meta['syncs3']['amazons3_identity_pool_id'] ) ? $form_meta['syncs3']['amazons3_identity_pool_id'] : '';
+	$form_key = ! empty( $form_meta['s3sync']['amazons3_identity_pool_id'] ) ? $form_meta['s3sync']['amazons3_identity_pool_id'] : '';
 
-	if ( ! empty( $field->type ) && 'syncs3_ajax_uploader' === $field->type && ! empty( $field->amazonS3IdentityPoolIdField ) ) {
+	if ( ! empty( $field->type ) && 's3sync_ajax_uploader' === $field->type && ! empty( $field->amazonS3IdentityPoolIdField ) ) {
 		// Use field-level key
 		$key = $field->amazonS3IdentityPoolIdField;
 	} else if ( ! empty( $form_key ) ) {
@@ -248,17 +248,17 @@ function syncs3_get_aws_identity_pool_id( $form = array(), $field = false ) {
  *
  * @return string   Access key
  */
-function syncs3_get_aws_access_key( $form = array(), $field = false ) {
+function s3sync_get_aws_access_key( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_key = ! empty( $settings['amazons3_access_key'] ) ? $settings['amazons3_access_key'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_key = ! empty( $form_meta['syncs3']['amazons3_access_key'] ) ? $form_meta['syncs3']['amazons3_access_key'] : '';
+	$form_key = ! empty( $form_meta['s3sync']['amazons3_access_key'] ) ? $form_meta['s3sync']['amazons3_access_key'] : '';
 
 	if ( ! empty( $field->type ) && 'fileupload' === $field->type && ! empty( $field->amazonS3AccessKeyField ) && ! empty( $field->amazonS3SecretKeyField ) ) {
 		// Use field-level key
@@ -284,17 +284,17 @@ function syncs3_get_aws_access_key( $form = array(), $field = false ) {
  *
  * @return string 	Secret key
  */
-function syncs3_get_aws_secret_key( $form = array(), $field = false ) {
+function s3sync_get_aws_secret_key( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_key = ! empty( $settings['amazons3_secret_key'] ) ? $settings['amazons3_secret_key'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_key = ! empty( $form_meta['syncs3']['amazons3_secret_key'] ) ? $form_meta['syncs3']['amazons3_secret_key'] : '';
+	$form_key = ! empty( $form_meta['s3sync']['amazons3_secret_key'] ) ? $form_meta['s3sync']['amazons3_secret_key'] : '';
 
 	if ( ! empty( $field->type ) && 'fileupload' === $field->type && ! empty( $field->amazonS3AccessKeyField ) && ! empty( $field->amazonS3SecretKeyField ) ) {
 		// Use field-level key
@@ -320,17 +320,17 @@ function syncs3_get_aws_secret_key( $form = array(), $field = false ) {
  *
  * @return string 	Secret key
  */
-function syncs3_get_aws_bucket_name( $form = array(), $field = false ) {
+function s3sync_get_aws_bucket_name( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_bucket = ! empty( $settings['amazons3_bucket_name'] ) ? $settings['amazons3_bucket_name'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_bucket = ! empty( $form_meta['syncs3']['amazons3_bucket_name'] ) ? $form_meta['syncs3']['amazons3_bucket_name'] : '';
+	$form_bucket = ! empty( $form_meta['s3sync']['amazons3_bucket_name'] ) ? $form_meta['s3sync']['amazons3_bucket_name'] : '';
 
 	if ( ! empty( $field->amazonS3BucketNameField ) ) {
 		// Use field-level key
@@ -356,17 +356,17 @@ function syncs3_get_aws_bucket_name( $form = array(), $field = false ) {
  *
  * @return string 	Secret key
  */
-function syncs3_get_aws_region( $form = array(), $field = false ) {
+function s3sync_get_aws_region( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_region = ! empty( $settings['amazons3_region'] ) ? $settings['amazons3_region'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_region = ! empty( $form_meta['syncs3']['amazons3_region'] ) ? $form_meta['syncs3']['amazons3_region'] : '';
+	$form_region = ! empty( $form_meta['s3sync']['amazons3_region'] ) ? $form_meta['s3sync']['amazons3_region'] : '';
 
 	if ( ! empty( $field->amazonS3RegionField ) ) {
 		// Use field-level key
@@ -392,17 +392,17 @@ function syncs3_get_aws_region( $form = array(), $field = false ) {
  *
  * @return string 	ACL
  */
-function syncs3_get_aws_acl( $form = array(), $field = false ) {
+function s3sync_get_aws_acl( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_region = ! empty( $settings['amazons3_region'] ) ? $settings['amazons3_region'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_region = ! empty( $form_meta['syncs3']['amazons3_acl'] ) ? $form_meta['syncs3']['amazons3_acl'] : '';
+	$form_region = ! empty( $form_meta['s3sync']['amazons3_acl'] ) ? $form_meta['s3sync']['amazons3_acl'] : '';
 
 	if ( ! empty( $field->amazonS3AclField ) ) {
 		// Use field-level key
@@ -428,17 +428,17 @@ function syncs3_get_aws_acl( $form = array(), $field = false ) {
  *
  * @return string 	Endpoint
  */
-function syncs3_get_aws_endpoint( $form = array(), $field = false ) {
+function s3sync_get_aws_endpoint( $form = array(), $field = false ) {
 
 	$key = '';
-	$settings = get_option( 'gravityformsaddon_syncs3_settings' );
+	$settings = get_option( 'gravityformsaddon_s3sync_settings' );
 
 	// Global key
 	$global_endpoint = ! empty( $settings['amazons3_endpoint'] ) ? $settings['amazons3_endpoint'] : '';
 
 	// Form-level key
 	$form_meta = ! empty( $form['id'] ) ? RGFormsModel::get_form_meta( $form['id'] ) : array();
-	$form_endpoint = ! empty( $form_meta['syncs3']['amazons3_endpoint'] ) ? $form_meta['syncs3']['amazons3_endpoint'] : '';
+	$form_endpoint = ! empty( $form_meta['s3sync']['amazons3_endpoint'] ) ? $form_meta['s3sync']['amazons3_endpoint'] : '';
 
 	if ( ! empty( $field->type ) && 'fileupload' === $field->type && ! empty( $field->amazonS3EndpointField ) ) {
 		// Use field-level key
@@ -464,15 +464,15 @@ function syncs3_get_aws_endpoint( $form = array(), $field = false ) {
  *
  * @return string 	Secret key
  */
-function syncs3_get_aws_settings( $form = array(), $field = false ) {
+function s3sync_get_aws_settings( $form = array(), $field = false ) {
 	return array(
-		'access_key' => syncs3_get_aws_access_key( $form, $field ),
-		'secret_key' => syncs3_get_aws_secret_key( $form, $field ),
-		'bucket_name' => syncs3_get_aws_bucket_name( $form, $field ),
-		'region' => syncs3_get_aws_region( $form, $field ),
-		'acl' => syncs3_get_aws_acl( $form, $field ),
-		'endpoint' => syncs3_get_aws_endpoint( $form, $field ),
-		'identity_pool_id' => syncs3_get_aws_identity_pool_id( $form, $field )
+		'access_key' => s3sync_get_aws_access_key( $form, $field ),
+		'secret_key' => s3sync_get_aws_secret_key( $form, $field ),
+		'bucket_name' => s3sync_get_aws_bucket_name( $form, $field ),
+		'region' => s3sync_get_aws_region( $form, $field ),
+		'acl' => s3sync_get_aws_acl( $form, $field ),
+		'endpoint' => s3sync_get_aws_endpoint( $form, $field ),
+		'identity_pool_id' => s3sync_get_aws_identity_pool_id( $form, $field )
 	);
 }
 
@@ -486,8 +486,8 @@ function syncs3_get_aws_settings( $form = array(), $field = false ) {
  *
  * @return string 	Secret key
  */
-function syncs3_get_aws_keys( $form = array(), $field = false ) {
-	return syncs3_get_aws_settings( $form, $field );
+function s3sync_get_aws_keys( $form = array(), $field = false ) {
+	return s3sync_get_aws_settings( $form, $field );
 }
 
 /**
@@ -497,7 +497,7 @@ function syncs3_get_aws_keys( $form = array(), $field = false ) {
  *
  * @return array
  */
-function syncs3_get_url_parts( $url ) {
+function s3sync_get_url_parts( $url ) {
 
 	$the_parts = explode( '/', str_replace( 'https://', '', $url ) );
 
@@ -523,7 +523,7 @@ function syncs3_get_url_parts( $url ) {
  *
  * @return boolean
  */
-function syncs3_is_file_public( $file ) {
+function s3sync_is_file_public( $file ) {
 	return ! empty( $file['acl'] ) && false === strpos( $file['acl'], 'private' );
 }
 
@@ -537,7 +537,7 @@ function syncs3_is_file_public( $file ) {
  *
 
  */
-function syncs3_get_entry_s3_urls( $entry, $presigned = false ) {
+function s3sync_get_entry_s3_urls( $entry, $presigned = false ) {
 
 	$entry_id = is_array( $entry ) && ! empty( $entry['id'] ) ? (int) $entry['id'] : (int) $entry;
 
@@ -568,12 +568,12 @@ function syncs3_get_entry_s3_urls( $entry, $presigned = false ) {
 					if ( ! empty( $url['endpoint'] ) ) {
 						$client_config['endpoint'] = $url['endpoint'];
 					}
-					$s3 = syncs3_s3_client( $client_config, $entry );
+					$s3 = s3sync_s3_client( $client_config, $entry );
 					$cmd = $s3->getCommand( 'GetObject', [
 						'Bucket' => $url['bucket'],
 						'Key' => $url['key']
 					]);
-					$request = $s3->createPresignedRequest( $cmd, apply_filters( 'syncs3_get_entry_s3_urls_presigned_link_time', '+20 minutes', $url, $entry_id, $field_id ) );
+					$request = $s3->createPresignedRequest( $cmd, apply_filters( 's3sync_get_entry_s3_urls_presigned_link_time', '+20 minutes', $url, $entry_id, $field_id ) );
 					$returned_urls[$field_id][$index]['signed'] = (string) $request->getUri();
 				}
 				$returned_urls[$field_id][$index]['unsigned'] = $url['file_url'];
@@ -595,14 +595,14 @@ function syncs3_get_entry_s3_urls( $entry, $presigned = false ) {
  *
  * @return array
  */
-function syncs3_get_s3_acls( $empty_option = false, $as_choices = false ) {
+function s3sync_get_s3_acls( $empty_option = false, $as_choices = false ) {
 	$acls = array(
-		'private' => __( 'Private', 'syncs3' ),
-		'public-read' => __( 'Public (Read)', 'syncs3' ),
-		'public-read-write' => __( 'Public (Read & Write)', 'syncs3' )
+		'private' => __( 'Private', 's3sync' ),
+		'public-read' => __( 'Public (Read)', 's3sync' ),
+		'public-read-write' => __( 'Public (Read & Write)', 's3sync' )
 	);
 
-	$acls = apply_filters( 'syncs3_acls_select_choices', $acls );
+	$acls = apply_filters( 's3sync_acls_select_choices', $acls );
 
 	if ( $empty_option ) {
 		$empty = array( '' => '' );
@@ -633,34 +633,34 @@ function syncs3_get_s3_acls( $empty_option = false, $as_choices = false ) {
  *
  * @return array
  */
-function syncs3_get_s3_regions( $empty_option = false, $as_choices = false ) {
+function s3sync_get_s3_regions( $empty_option = false, $as_choices = false ) {
 	$regions = array(
-		'us-east-2' => __( 'US East (Ohio)', 'syncs3' ),
-		'us-east-1' => __( 'US East (N. Virginia)', 'syncs3' ),
-		'us-west-1' => __( 'US West (N. California)', 'syncs3' ),
-		'us-west-2' => __( 'US West (Oregon)', 'syncs3' ),
-		'af-south-1' => __( 'Africa (Cape Town)', 'syncs3' ),
-		'ap-east-1' => __( 'Asia Pacific (Hong Kong)', 'syncs3' ),
-		'ap-south-1' => __( 'Asia Pacific (Mumbai)', 'syncs3' ),
-		'ap-northeast-3' => __( 'Asia Pacific (Osaka-Local)', 'syncs3' ),
-		'ap-northeast-2' => __( 'Asia Pacific (Seoul)', 'syncs3' ),
-		'ap-southeast-1' => __( 'Asia Pacific (Singapore)', 'syncs3' ),
-		'ap-southeast-2' => __( 'Asia Pacific (Sydney)', 'syncs3' ),
-		'ap-northeast-1' => __( 'Asia Pacific (Tokyo)', 'syncs3' ),
-		'ca-central-1' => __( 'Canada (Central)', 'syncs3' ),
-		'cn-north-1' => __( 'China (Beijing)', 'syncs3' ),
-		'cn-northwest-1' => __( 'China (Ningxia)', 'syncs3' ),
-		'eu-central-1' => __( 'Europe (Frankfurt)', 'syncs3' ),
-		'eu-west-1' => __( 'Europe (Ireland)', 'syncs3' ),
-		'eu-west-2' => __( 'Europe (London)', 'syncs3' ),
-		'eu-south-1' => __( 'Europe (Milan)', 'syncs3' ),
-		'eu-west-3' => __( 'Europe (Paris)', 'syncs3' ),
-		'eu-north-1' => __( 'Europe (Stockholm)', 'syncs3' ),
-		'me-south-1' => __( 'Middle East (Bahrain)', 'syncs3' ),
-		'sa-east-1' => __( 'South America (São Paulo)', 'syncs3' )
+		'us-east-2' => __( 'US East (Ohio)', 's3sync' ),
+		'us-east-1' => __( 'US East (N. Virginia)', 's3sync' ),
+		'us-west-1' => __( 'US West (N. California)', 's3sync' ),
+		'us-west-2' => __( 'US West (Oregon)', 's3sync' ),
+		'af-south-1' => __( 'Africa (Cape Town)', 's3sync' ),
+		'ap-east-1' => __( 'Asia Pacific (Hong Kong)', 's3sync' ),
+		'ap-south-1' => __( 'Asia Pacific (Mumbai)', 's3sync' ),
+		'ap-northeast-3' => __( 'Asia Pacific (Osaka-Local)', 's3sync' ),
+		'ap-northeast-2' => __( 'Asia Pacific (Seoul)', 's3sync' ),
+		'ap-southeast-1' => __( 'Asia Pacific (Singapore)', 's3sync' ),
+		'ap-southeast-2' => __( 'Asia Pacific (Sydney)', 's3sync' ),
+		'ap-northeast-1' => __( 'Asia Pacific (Tokyo)', 's3sync' ),
+		'ca-central-1' => __( 'Canada (Central)', 's3sync' ),
+		'cn-north-1' => __( 'China (Beijing)', 's3sync' ),
+		'cn-northwest-1' => __( 'China (Ningxia)', 's3sync' ),
+		'eu-central-1' => __( 'Europe (Frankfurt)', 's3sync' ),
+		'eu-west-1' => __( 'Europe (Ireland)', 's3sync' ),
+		'eu-west-2' => __( 'Europe (London)', 's3sync' ),
+		'eu-south-1' => __( 'Europe (Milan)', 's3sync' ),
+		'eu-west-3' => __( 'Europe (Paris)', 's3sync' ),
+		'eu-north-1' => __( 'Europe (Stockholm)', 's3sync' ),
+		'me-south-1' => __( 'Middle East (Bahrain)', 's3sync' ),
+		'sa-east-1' => __( 'South America (São Paulo)', 's3sync' )
 	);
 
-	$regions = apply_filters( 'syncs3_regions_select_choices', $regions );
+	$regions = apply_filters( 's3sync_regions_select_choices', $regions );
 
 	if ( $empty_option ) {
 		$empty = array( '' => '' );
@@ -694,7 +694,7 @@ function syncs3_get_s3_regions( $empty_option = false, $as_choices = false ) {
  *
  * @return boolean True if file is deleted, else false
  */
-function syncs3_delete_file( $entry_id, $field_id, $file_name ) {
+function s3sync_delete_file( $entry_id, $field_id, $file_name ) {
 	$s3_urls = gform_get_meta( $entry_id, 's3_urls' );
 
 	if ( ! empty( $s3_urls ) ) {
@@ -702,7 +702,7 @@ function syncs3_delete_file( $entry_id, $field_id, $file_name ) {
 		foreach ( $s3_urls as $field_id => $urls ) {
 			if ( ! empty( $urls ) ) {
 				foreach ( $urls as $index => $url ) {
-					if ( is_array( $url ) && ! empty( $url['file_url'] ) && $file_name === syncs3_get_url_parts( $url['file_url'] )['file_name'] ) {
+					if ( is_array( $url ) && ! empty( $url['file_url'] ) && $file_name === s3sync_get_url_parts( $url['file_url'] )['file_name'] ) {
 						$s3 = new \Aws\S3\S3Client( array(
 							'version' => 'latest',
 							'region' => $url['region'],
@@ -743,10 +743,10 @@ function syncs3_delete_file( $entry_id, $field_id, $file_name ) {
  *
  * @return mixed 	URL if request is good, else false
  */
-function syncs3_create_s3_request( $args ) {
+function s3sync_create_s3_request( $args ) {
 	$client = $args['client'];	
 	$url = false;
-	$args = apply_filters( 'syncs3_create_s3_request_args', $args );
+	$args = apply_filters( 's3sync_create_s3_request_args', $args );
 	if ( true === $args['presigned'] ) {
 		$cmd = $client->getCommand( 'GetObject', [
 			'Bucket' => $args['url']['bucket'],
@@ -771,10 +771,10 @@ function syncs3_create_s3_request( $args ) {
  *
  * @return boolean
  */
-function syncs3_form_has_uploader( $form ) {
+function s3sync_form_has_uploader( $form ) {
 	if ( is_array( $form['fields'] ) ) {
 		foreach ( $form['fields'] as $field ) {
-			if ( RGFormsModel::get_input_type( $field ) == 'syncs3_ajax_uploader' ) {
+			if ( RGFormsModel::get_input_type( $field ) == 's3sync_ajax_uploader' ) {
 				return true;
 			}
 		}
@@ -791,7 +791,7 @@ function syncs3_form_has_uploader( $form ) {
  *
  * @return int
  */
-function syncs3_get_max_files( $field = false ) {
+function s3sync_get_max_files( $field = false ) {
 	return ! empty( $field->amazonS3MaxFilesField ) ? (int) $field->amazonS3MaxFilesField : 9999999999;
 }
 
@@ -804,7 +804,7 @@ function syncs3_get_max_files( $field = false ) {
  *
  * @return string   Accepted files
  */
-function syncs3_get_accepted_files( $field = false ) {
+function s3sync_get_accepted_files( $field = false ) {
 	return ! empty( $field->amazonS3AcceptedFilesField ) ? sanitize_text_field( $field->amazonS3AcceptedFilesField ) : '';
 }
 
@@ -817,6 +817,6 @@ function syncs3_get_accepted_files( $field = false ) {
  *
  * @return string   Accepted files
  */
-function syncs3_get_upload_action( $field = false ) {
+function s3sync_get_upload_action( $field = false ) {
 	return ! empty( $field->amazonS3UploadActionField ) ? sanitize_text_field( $field->amazonS3UploadActionField ) : '';
 }

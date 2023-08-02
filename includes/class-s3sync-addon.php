@@ -19,7 +19,7 @@ class S3SyncAddon extends GFAddOn {
 	protected $_capabilities_settings_page = 'gravityforms_s3sync';
 	protected $_capabilities_form_settings = 'gravityforms_s3sync';
 	protected $_capabilities_uninstall = 'gravityforms_s3sync_uninstall';
-	protected $_capabilities = array( 'gravityforms_s3sync', 'gravityforms_syncs3_uninstall' );
+	protected $_capabilities = array( 'gravityforms_s3sync', 'gravityforms_s3sync_uninstall' );
 
 	private static $_instance = null;
 
@@ -48,7 +48,7 @@ class S3SyncAddon extends GFAddOn {
 		add_action( 'gform_editor_js', array( $this, 'editor_script' ) );
 		add_filter( 'gform_tooltips', array( $this, 'add_tooltips' ) );
 		add_filter( 'gform_entry_detail_meta_boxes', array( $this, 'meta_box' ), 10, 3 );
-		// add_action( 'gform_settings_syncs3', array( $this, 'upgrade_info' ), 5 );
+		
 	}
 
 
@@ -60,64 +60,57 @@ class S3SyncAddon extends GFAddOn {
 	public function plugin_settings_fields2() {
 		return array(
 			array(
-				'title'  => esc_html__( 'SyncS3 Settings', 'syncs3' ),
+				'title'  => esc_html__( 'S3Sync Settings', 's3sync' ),
 				'icon' => 'dashicons-media-document',
 				'fields' => array(
 					array(
 						'name' => 'amazons3_access_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Access Key.', 'syncs3' ),
-						'label' => esc_html__( 'Access Key', 'syncs3' ),
+						'tooltip' => esc_html__( 'Your Amazon AWS Access Key.', 's3sync' ),
+						'label' => esc_html__( 'Access Key', 's3sync' ),
 						'type' => 'text',
 						'class' => 'large'
 					),
 					array(
 						'name' => 'amazons3_secret_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Secret Key.', 'syncs3' ),
-						'label' => esc_html__( 'Secret Key', 'syncs3' ),
+						'tooltip' => esc_html__( 'Your Amazon AWS Secret Key.', 's3sync' ),
+						'label' => esc_html__( 'Secret Key', 's3sync' ),
 						'type' => 'text',
 						'class' => 'large'
 					),
 					array(
 						'name' => 'amazons3_bucket_name',
-						'tooltip' => esc_html__( 'Default bucket name. This can be overridden on a form and field level.', 'syncs3' ),
-						'label' => esc_html__( 'Default Bucket', 'syncs3' ),
+						'tooltip' => esc_html__( 'Default bucket name. This can be overridden on a form and field level.', 's3sync' ),
+						'label' => esc_html__( 'Default Bucket', 's3sync' ),
 						'type' => 'text',
 						'class' => 'medium'
 					),
 					array(
 						'name' => 'amazons3_region',
-						'label' => esc_html__( 'Region', 'syncs3' ),
+						'label' => esc_html__( 'Region', 's3sync' ),
 						'type' => 'select_custom',
-						'choices' => syncs3_get_s3_regions( true, true )
+						'choices' => s3sync_get_s3_regions( true, true )
 					),
 					array(
 						'name' => 'amazons3_acl',
-						'label' => esc_html__( 'ACL', 'syncs3' ),
+						'label' => esc_html__( 'ACL', 's3sync' ),
 						'type' => 'select_custom',
-						'choices' => syncs3_get_s3_acls( true, true ),
-						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. This can be overridden on a form and field level.', 'syncs3' ),
+						'choices' => s3sync_get_s3_acls( true, true ),
+						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. This can be overridden on a form and field level.', 's3sync' ),
 					),
 					array(
 						'name' => 'amazons3_endpoint',
-						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 'syncs3' ),
-						'label' => esc_html__( 'Endpoint', 'syncs3' ),
+						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 's3sync' ),
+						'label' => esc_html__( 'Endpoint', 's3sync' ),
 						'type' => 'text',
 						'class' => 'medium',
 					),
 					array(
 						'name' => 'amazons3_identity_pool_id',
-						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader.', 'syncs3' ),
-						'label' => esc_html__( 'Identity Pool ID', 'syncs3' ),
+						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader.', 's3sync' ),
+						'label' => esc_html__( 'Identity Pool ID', 's3sync' ),
 						'type' => 'text',
 						'class' => 'large'
 					),
-// array(
-//     'name' => 'syncs3_license_key',
-//     'tooltip' => esc_html__( 'Your SyncS3 License Key.', 'syncs3' ),
-//     'label' => esc_html__( 'License Key', 'syncs3' ),
-//     'type' => 'text',
-//     'class' => 'large'
-// ),
 
 				)
 			)
@@ -133,54 +126,54 @@ class S3SyncAddon extends GFAddOn {
 	public function form_settings_fields( $form ) {
 		return array(
 			array(
-				'title'  => esc_html__( 'SyncS3 Settings', 'syncs3' ),
+				'title'  => esc_html__( 'S3Sync Settings', 's3sync' ),
 				'fields' => array(
 					array(
-						'label' => esc_html__( 'Access Key', 'syncs3' ),
+						'label' => esc_html__( 'Access Key', 's3sync' ),
 						'type' => 'text',
 						'name' => 'amazons3_access_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Access Key. This will override the global setting, allowing you to send files to a different Amazon S3 account. If left empty, the global setting will be used. This can also be overridden from the field level.', 'syncs3' ),
+						'tooltip' => esc_html__( 'Your Amazon AWS Access Key. This will override the global setting, allowing you to send files to a different Amazon S3 account. If left empty, the global setting will be used. This can also be overridden from the field level.', 's3sync' ),
 						'class' => 'large'
 					),
 					array(
-						'label' => esc_html__( 'Secret Key', 'syncs3' ),
+						'label' => esc_html__( 'Secret Key', 's3sync' ),
 						'type' => 'text',
 						'name' => 'amazons3_secret_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Secret Key. This will override the global setting, allowing you to send files to a different Amazon S3 account. If left empty, the global setting will be used. This can also be overridden from the field level.', 'syncs3' ),
+						'tooltip' => esc_html__( 'Your Amazon AWS Secret Key. This will override the global setting, allowing you to send files to a different Amazon S3 account. If left empty, the global setting will be used. This can also be overridden from the field level.', 's3sync' ),
 						'class' => 'large'
 					),
 					array(
-						'label' => esc_html__( 'Bucket Name', 'syncs3' ),
+						'label' => esc_html__( 'Bucket Name', 's3sync' ),
 						'type' => 'text',
 						'name' => 'amazons3_bucket_name',
-						'tooltip' => esc_html__( 'Bucket to which the files should be added. If left empty, the global setting will be used. This can also be overridden from the field level.', 'syncs3' ),
+						'tooltip' => esc_html__( 'Bucket to which the files should be added. If left empty, the global setting will be used. This can also be overridden from the field level.', 's3sync' ),
 						'class' => 'medium'
 					),
 					array(
 						'name'    => 'amazons3_region',
-						'label'   => esc_html__( 'Region', 'syncs3' ),
+						'label'   => esc_html__( 'Region', 's3sync' ),
 						'type'    => 'select_custom',
-						'choices' => syncs3_get_s3_regions( true, true )
+						'choices' => s3sync_get_s3_regions( true, true )
 					),
 					array(
 						'name'    => 'amazons3_acl',
-						'label'   => esc_html__( 'ACL', 'syncs3' ),
+						'label'   => esc_html__( 'ACL', 's3sync' ),
 						'type'    => 'select_custom',
-						'choices' => syncs3_get_s3_acls( true, true ),
-						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.', 'syncs3' ),
+						'choices' => s3sync_get_s3_acls( true, true ),
+						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.', 's3sync' ),
 					),
 					array(
 						'name' => 'amazons3_endpoint',
-						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 'syncs3' ),
-						'label' => esc_html__( 'Endpoint', 'syncs3' ),
+						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 's3sync' ),
+						'label' => esc_html__( 'Endpoint', 's3sync' ),
 						'type' => 'text',
 						'class' => 'medium',
 					),
 					array(
-						'label' => esc_html__( 'Identity Pool ID', 'syncs3' ),
+						'label' => esc_html__( 'Identity Pool ID', 's3sync' ),
 						'type' => 'text',
 						'name' => 'amazons3_identity_pool_id',
-						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader. This will override the global setting. If left empty, the global setting will be used. This can also be overridden from the field level.', 'syncs3' ),
+						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader. This will override the global setting. If left empty, the global setting will be used. This can also be overridden from the field level.', 's3sync' ),
 						'class' => 'large'
 					),
 				),
@@ -202,39 +195,37 @@ class S3SyncAddon extends GFAddOn {
 		if ( $position == -1 ) {
 			?>
 			<style>
-				.syncs3-field-settings {
-					/*display: none;*/
-				}
-				.ginput_container_fileupload ~ .ui-tabs .syncs3-field-settings,
-				.ginput_container_syncs3_ajax_uploader ~ .ui-tabs .syncs3-field-settings {
+		
+				.ginput_container_fileupload ~ .ui-tabs .s3sync-field-settings,
+				.ginput_container_s3sync_ajax_uploader ~ .ui-tabs .s3sync-field-settings {
 					display: block;
 					background-color: #f5f5f5; 
 					padding: 20px; 
 					margin-top: 20px;
 				}
 			</style>
-			<div class="syncs3-field-settings">
-				<h3 style="margin-top: 0;"><?php esc_html_e( 'Amazon S3 Upload Settings', 'syncs3' ); ?></h3>
+			<div class="s3sync-field-settings">
+				<h3 style="margin-top: 0;"><?php esc_html_e( 'Amazon S3 Upload Settings', 's3sync' ); ?></h3>
 				<li class="amazons3_identity_pool_id_setting_desc field_setting">
 					<div class="notice inline notice-info">
-						<p><?php _e( 'The "Direct to S3" uploader uses special S3 settings and configurations to upload files directly from the browser to your S3 bucket. To ensure a proper setup, first follow these steps:', 'syncs3' ); ?></p>
-						<p><?php _e( '1. Make sure you have created your bucket. Note your bucket\'s region, as you will need it in the next step.', 'syncs3' ); ?></p>
-						<p><?php _e( '2. In the <a href="https://console.aws.amazon.com/cognito/" target="_blank">Amazon Cognito console</a>, create an Amazon Cognito identity pool using Federated Identities with access enabled for unauthenticated users in the same Region as your S3 bucket. You need to include the identity pool ID in the code to obtain credentials for the browser script.', 'syncs3' ); ?></p>
-						<p><?php _e( '3. In the <a href="https://console.aws.amazon.com/iam/" target="_blank">IAM console</a>, find the IAM role created by Amazon Cognito for <strong>unauthenticated users</strong>. Add the following policy to grant <strong>read and write permissions</strong> to your S3 bucket (replace <code>BUCKET_NAME</code> with your bucket\'s slug). ', 'syncs3' ); ?></p>
+						<p><?php _e( 'The "Direct to S3" uploader uses special S3 settings and configurations to upload files directly from the browser to your S3 bucket. To ensure a proper setup, first follow these steps:', 's3sync' ); ?></p>
+						<p><?php _e( '1. Make sure you have created your bucket. Note your bucket\'s region, as you will need it in the next step.', 's3sync' ); ?></p>
+						<p><?php _e( '2. In the <a href="https://console.aws.amazon.com/cognito/" target="_blank">Amazon Cognito console</a>, create an Amazon Cognito identity pool using Federated Identities with access enabled for unauthenticated users in the same Region as your S3 bucket. You need to include the identity pool ID in the code to obtain credentials for the browser script.', 's3sync' ); ?></p>
+						<p><?php _e( '3. In the <a href="https://console.aws.amazon.com/iam/" target="_blank">IAM console</a>, find the IAM role created by Amazon Cognito for <strong>unauthenticated users</strong>. Add the following policy to grant <strong>read and write permissions</strong> to your S3 bucket (replace <code>BUCKET_NAME</code> with your bucket\'s slug). ', 's3sync' ); ?></p>
 
 					</div>
 				</li>
 				<li class="amazons3_enable_setting field_setting">
 					<input type="checkbox" id="field_amazons3_enable" onclick="SetFieldProperty('enableS3Field', this.checked);" />
 					<label for="field_amazons3_enable" style="display:inline;">
-						<?php esc_html_e( 'Enable Uploads to S3', 'syncs3' ); ?>
+						<?php esc_html_e( 'Enable Uploads to S3', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_enable' ) ?>
 					</label>
 				</li>
 				<li class="amazons3_unlink_setting field_setting">
 					<input type="checkbox" id="field_amazons3_unlink" onclick="SetFieldProperty('amazonS3UnlinkField', this.checked);" />
 					<label for="field_amazons3_unlink" style="display:inline;">
-						<?php esc_html_e( 'Remove File After Uploading to S3', 'syncs3' ); ?>
+						<?php esc_html_e( 'Remove File After Uploading to S3', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_unlink' ) ?>
 					</label>
 				</li>
@@ -242,7 +233,7 @@ class S3SyncAddon extends GFAddOn {
 				
 					
 					<label for="field_amazons3_access_key" class="section_label">
-						<?php esc_html_e( 'Access Key', 'syncs3' ); ?>
+						<?php esc_html_e( 'Access Key', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_access_key' ) ?>
 					</label>
 					<input type="text" value="" id="field_amazons3_access_key" size="35" onchange="SetFieldProperty('amazonS3AccessKeyField', this.value);" />
@@ -250,78 +241,78 @@ class S3SyncAddon extends GFAddOn {
 				</li>
 				<li class="amazons3_secret_key_setting field_setting">
 					<label for="field_amazons3_secret_key" class="section_label">
-						<?php esc_html_e( 'Secret Key', 'syncs3' ); ?>
+						<?php esc_html_e( 'Secret Key', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_secret_key' ) ?>
 					</label>
 					<input type="text" value="" id="field_amazons3_secret_key" size="35" onchange="SetFieldProperty('amazonS3SecretKeyField', this.value);" />
 				</li>
 				<li class="amazons3_bucket_name_setting field_setting">
 					<label for="field_amazons3_bucket_name" class="section_label">
-						<?php esc_html_e( 'Bucket Name', 'syncs3' ); ?>
+						<?php esc_html_e( 'Bucket Name', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_bucket_name' ) ?>
 					</label>
 					<input type="text" value="" id="field_amazons3_bucket_name" size="35" onchange="SetFieldProperty('amazonS3BucketNameField', this.value);" />
 				</li>
 				<li class="amazons3_region_setting field_setting">
 					<label for="field_amazons3_region" class="section_label">
-						<?php esc_html_e( 'Region', 'syncs3' ); ?>
+						<?php esc_html_e( 'Region', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_region' ) ?>
 					</label>
 					<!-- <input type="text" value="" id="field_amazons3_region" size="35" onchange="SetFieldProperty('amazonS3RegionField', this.value);" /> -->
 					<select id="field_amazons3_region" onchange="SetFieldProperty('amazonS3RegionField', this.value);">
-						<?php foreach ( syncs3_get_s3_regions( true ) as $key => $label ) : ?>
+						<?php foreach ( s3sync_get_s3_regions( true ) as $key => $label ) : ?>
 							<option value="<?php esc_attr_e( $key ); ?>"><?php esc_html_e( $label ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</li>
 				<li class="amazons3_acl_setting field_setting">
 					<label for="field_amazons3_acl" class="section_label">
-						<?php esc_html_e( 'ACL', 'syncs3' ); ?>
+						<?php esc_html_e( 'ACL', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_acl' ) ?>
 					</label>
 					<!-- <input type="text" value="" id="field_amazons3_acl" size="35" onchange="SetFieldProperty('amazonS3AclField', this.value);" /> -->
 					<select id="field_amazons3_acl" onchange="SetFieldProperty('amazonS3AclField', this.value);">
-						<?php foreach ( syncs3_get_s3_acls( true ) as $key => $label ) : ?>
+						<?php foreach ( s3sync_get_s3_acls( true ) as $key => $label ) : ?>
 							<option value="<?php esc_attr_e( $key ); ?>"><?php esc_html_e( $label ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</li>
 				<li class="amazons3_endpoint_setting field_setting">
 					<label for="field_amazons3_endpoint" class="section_label">
-						<?php esc_html_e( 'Endpoint', 'syncs3' ); ?>
+						<?php esc_html_e( 'Endpoint', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_endpoint' ) ?>
 					</label>
 					<input type="url" value="" id="field_amazons3_endpoint" size="35" onchange="SetFieldProperty('amazonS3EndpointField', this.value);" />
 				</li>
 				<li class="amazons3_identity_pool_id_setting field_setting">
 					<label for="field_amazons3_identity_pool_id" class="section_label">
-						<?php esc_html_e( 'Identity Pool ID', 'syncs3' ); ?>
+						<?php esc_html_e( 'Identity Pool ID', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_identity_pool_id' ) ?>
 					</label>
 					<input type="text" value="" id="field_amazons3_identity_pool_id" size="35" onchange="SetFieldProperty('amazonS3IdentityPoolIdField', this.value);" />
 				</li>
 				<li class="amazons3_max_files_setting field_setting">
 					<label for="field_amazons3_max_files" class="section_label">
-						<?php esc_html_e( 'Maximum Number of Files', 'syncs3' ); ?>
+						<?php esc_html_e( 'Maximum Number of Files', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_max_files' ) ?>
 					</label>
 					<input type="number" value="" id="field_amazons3_max_files" size="35" onchange="SetFieldProperty('amazonS3MaxFilesField', this.value);" />
 				</li>
 				<li class="amazons3_accepted_files_setting field_setting">
 					<label for="field_amazons3_accepted_files" class="section_label">
-						<?php esc_html_e( 'Accepted Files', 'syncs3' ); ?>
+						<?php esc_html_e( 'Accepted Files', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_accepted_files' ) ?>
 					</label>
 					<input type="text" value="" id="field_amazons3_accepted_files" size="35" onchange="SetFieldProperty('amazonS3AcceptedFilesField', this.value);" />
 				</li>
 				<li class="amazons3_upload_action_setting field_setting">
 					<label for="field_amazons3_upload_action" class="section_label">
-						<?php esc_html_e( 'Upload Action', 'syncs3' ); ?>
+						<?php esc_html_e( 'Upload Action', 's3sync' ); ?>
 						<?php gform_tooltip( 'form_field_amazons3_upload_action' ) ?>
 					</label>
 					<select id="field_amazons3_upload_action" onchange="SetFieldProperty('amazonS3UploadActionField', this.value);">
-						<option value="file-selected"><?php _e( 'File Select', 'syncs3' ); ?></option>
-						<option value="form-submit"><?php _e( 'Form Submit', 'syncs3' ); ?></option>
+						<option value="file-selected"><?php _e( 'File Select', 's3sync' ); ?></option>
+						<option value="form-submit"><?php _e( 'Form Submit', 's3sync' ); ?></option>
 					</select>
 				</li>
 			</div>
@@ -341,7 +332,7 @@ class S3SyncAddon extends GFAddOn {
 		<script>
 			// Add setting to fileupload field type
 			fieldSettings.fileupload += ", .amazons3_enable_setting, .amazons3_access_key_setting, .amazons3_secret_key_setting, .amazons3_bucket_name_setting, .amazons3_region_setting, .amazons3_acl_setting, .amazons3_endpoint_setting, .amazons3_unlink_setting";
-			fieldSettings.syncs3_ajax_uploader += ".amazons3_bucket_name_setting, .amazons3_region_setting, .amazons3_acl_setting, .amazons3_identity_pool_id_setting, .amazons3_identity_pool_id_setting_desc, .amazons3_max_files_setting, .amazons3_accepted_files_setting, .amazons3_upload_action_setting";
+			fieldSettings.s3sync_ajax_uploader += ".amazons3_bucket_name_setting, .amazons3_region_setting, .amazons3_acl_setting, .amazons3_identity_pool_id_setting, .amazons3_identity_pool_id_setting_desc, .amazons3_max_files_setting, .amazons3_accepted_files_setting, .amazons3_upload_action_setting";
 	
 			// binding to the load field settings event to initialize the checkbox
 			jQuery(document).on("gform_load_field_settings", function(event, field, form){
@@ -380,18 +371,18 @@ class S3SyncAddon extends GFAddOn {
 	 * @return array
 	 */
 	public function add_tooltips( $tooltips ) {
-		$tooltips['form_field_amazons3_enable'] = __( "<h6>Enable</h6>This will enable sending file uploads to Amazon S3.", 'syncs3' );
-		$tooltips['form_field_amazons3_unlink'] = __( "<h6>Delete File</h6>This will delete the file locally (from your server) after it's uploaded to S3.", 'syncs3' );
-		$tooltips['form_field_amazons3_access_key'] = __( "<h6>Access Key</h6>Your Amazon AWS Access Key. This will override the global or form setting, allowing you to send files to a different Amazon S3 account.", 'syncs3' );
-		$tooltips['form_field_amazons3_secret_key'] = __( "<h6>Secret Key</h6>Your Amazon AWS Secret Key. This will override the global or form setting, allowing you to send files to a different Amazon S3 account.", 'syncs3' );
-		$tooltips['form_field_amazons3_bucket_name'] = __( "<h6>Bucket Name</h6>Bucket to which the files should be added. If left empty, the global setting will be used.", 'syncs3' );
-		$tooltips['form_field_amazons3_region'] = __( "<h6>Region</h6>Region for the bucket. If left empty, the global setting will be used.", 'syncs3' );
-		$tooltips['form_field_amazons3_acl'] = __( "<h6>ACL</h6>Amazon S3 supports a set of predefined grants, known as <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl\" target=\"_blank\">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.", 'syncs3' );
-		$tooltips['form_field_amazons3_endpoint'] = __( "<h6>Endpoint</h6>WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.", 'syncs3' );
-		$tooltips['form_field_amazons3_identity_pool_id'] = __( "<h6>Identity Pool ID</h6>This will look something like: us-east-2:86dcc0b2-60bb-4001-a512-b643451a5b3e", 'syncs3' );
-		$tooltips['form_field_amazons3_max_files'] = __( "<h6>Maximum Number of Files</h6>Limit the number of files that can be uploaded.", 'syncs3' );
-		$tooltips['form_field_amazons3_accepted_files'] = __( "<h6>Accepted Files</h6>A comma separated list of mime types or file extensions.", 'syncs3' );
-		$tooltips['form_field_amazons3_upload_action'] = __( "<h6>Upload Action</h6>When the files should be uploaded. <strong>File Select</strong> - When the user selects their files. <strong>Form Submit</strong> - When the user submits the form.", 'syncs3' );
+		$tooltips['form_field_amazons3_enable'] = __( "<h6>Enable</h6>This will enable sending file uploads to Amazon S3.", 's3sync' );
+		$tooltips['form_field_amazons3_unlink'] = __( "<h6>Delete File</h6>This will delete the file locally (from your server) after it's uploaded to S3.", 's3sync' );
+		$tooltips['form_field_amazons3_access_key'] = __( "<h6>Access Key</h6>Your Amazon AWS Access Key. This will override the global or form setting, allowing you to send files to a different Amazon S3 account.", 's3sync' );
+		$tooltips['form_field_amazons3_secret_key'] = __( "<h6>Secret Key</h6>Your Amazon AWS Secret Key. This will override the global or form setting, allowing you to send files to a different Amazon S3 account.", 's3sync' );
+		$tooltips['form_field_amazons3_bucket_name'] = __( "<h6>Bucket Name</h6>Bucket to which the files should be added. If left empty, the global setting will be used.", 's3sync' );
+		$tooltips['form_field_amazons3_region'] = __( "<h6>Region</h6>Region for the bucket. If left empty, the global setting will be used.", 's3sync' );
+		$tooltips['form_field_amazons3_acl'] = __( "<h6>ACL</h6>Amazon S3 supports a set of predefined grants, known as <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl\" target=\"_blank\">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.", 's3sync' );
+		$tooltips['form_field_amazons3_endpoint'] = __( "<h6>Endpoint</h6>WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.", 's3sync' );
+		$tooltips['form_field_amazons3_identity_pool_id'] = __( "<h6>Identity Pool ID</h6>This will look something like: us-east-2:86dcc0b2-60bb-4001-a512-b643451a5b3e", 's3sync' );
+		$tooltips['form_field_amazons3_max_files'] = __( "<h6>Maximum Number of Files</h6>Limit the number of files that can be uploaded.", 's3sync' );
+		$tooltips['form_field_amazons3_accepted_files'] = __( "<h6>Accepted Files</h6>A comma separated list of mime types or file extensions.", 's3sync' );
+		$tooltips['form_field_amazons3_upload_action'] = __( "<h6>Upload Action</h6>When the files should be uploaded. <strong>File Select</strong> - When the user selects their files. <strong>Form Submit</strong> - When the user submits the form.", 's3sync' );
 		return $tooltips;
 	}
 	/**
@@ -415,7 +406,7 @@ class S3SyncAddon extends GFAddOn {
 				continue;
 			}
 
-			$uploaded = syncs3_send_entry_files_to_s3( $entry, $form['id'], $field->id, syncs3_get_aws_keys( $form, $field ), $field->amazonS3UnlinkField );
+			$uploaded = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, s3sync_get_aws_keys( $form, $field ), $field->amazonS3UnlinkField );
 		}
 	}
 
@@ -431,7 +422,7 @@ class S3SyncAddon extends GFAddOn {
 	public function meta_box( $meta_boxes, $entry, $form ) {
 		
 		$meta_boxes['s3_urls'] = array(
-			'title'    => esc_html__( 'S3 URLs', 'syncs3' ),
+			'title'    => esc_html__( 'S3 URLs', 's3sync' ),
 			'callback' => array( $this, 'render_mb' ),
 			'context'  => 'normal',
 			'priority' => 'high',

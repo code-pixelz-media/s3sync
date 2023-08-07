@@ -2,7 +2,7 @@
 /**
  * Plugin Name: S3Sync Gravity Forms Addon
  * Plugin URI: https://codepixelzmedia.com.np/
- * Description: Push and sync Gravity Forms file uploads to your Amazon S3 buckets.
+ * Description: Push uploaded files from gravity forms to Amazon S3
  * Version: 1.0.0
  * Author: Codepixelzmedia
  * Author URI: https://codepixelzmedia.com.np/
@@ -81,7 +81,7 @@ if (!class_exists('S3Sync')):
         public static function autoload()
         {
             if (!class_exists('Aws\AwsClient')) {
-                require 'lib/autoload.php';
+                require 'lib/vendor/autoload.php';
 
             }
         }
@@ -99,6 +99,7 @@ if (!class_exists('S3Sync')):
          */
         public function hooks()
         {
+   
             add_action('plugins_loaded', array($this, 'loaded'));
             add_action('gform_loaded', array($this, 'register_addon'), 5);
         }
@@ -151,4 +152,16 @@ function S3Sync()
     return S3Sync::instance();
 }
 
-S3Sync();
+
+add_action( 'plugins_loaded', 'syncs3_bootstrap', 1 );
+/**
+ * Function to intialize plugin on plugins_loaded hook
+ *  
+ * @return void
+ */
+ function s3sync_bootstrap(){
+    
+    S3Sync();
+ }
+ 
+ 

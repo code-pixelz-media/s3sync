@@ -250,9 +250,7 @@ class S3SyncAddon extends GFAddOn {
 		if ( $position == -1 ) {
 			?>
 			<style>
-				.s3sync-field-settings {
-					/*display: none;*/
-				}
+	
 				.ginput_container_fileupload ~ .ui-tabs .s3sync-field-settings,
 				.ginput_container_s3sync_ajax_uploader ~ .ui-tabs .s3sync-field-settings {
 					display: block;
@@ -263,59 +261,7 @@ class S3SyncAddon extends GFAddOn {
 			</style>
 			<div class="s3sync-field-settings">
 				<h3 style="margin-top: 0;"><?php esc_html_e( 'Amazon S3 Upload Settings', 's3sync' ); ?></h3>
-				<li class="amazons3_identity_pool_id_setting_desc field_setting">
-					<div class="notice inline notice-info">
-						<p><?php _e( 'The "Direct to S3" uploader uses special S3 settings and configurations to upload files directly from the browser to your S3 bucket. To ensure a proper setup, first follow these steps:', 's3sync' ); ?></p>
-						<p><?php _e( '1. Make sure you have created your bucket. Note your bucket\'s region, as you will need it in the next step.', 's3sync' ); ?></p>
-						<p><?php _e( '2. In the <a href="https://console.aws.amazon.com/cognito/" target="_blank">Amazon Cognito console</a>, create an Amazon Cognito identity pool using Federated Identities with access enabled for unauthenticated users in the same Region as your S3 bucket. You need to include the identity pool ID in the code to obtain credentials for the browser script.', 's3sync' ); ?></p>
-						<p><?php _e( '3. In the <a href="https://console.aws.amazon.com/iam/" target="_blank">IAM console</a>, find the IAM role created by Amazon Cognito for <strong>unauthenticated users</strong>. Add the following policy to grant <strong>read and write permissions</strong> to your S3 bucket (replace <code>BUCKET_NAME</code> with your bucket\'s slug). ', 's3sync' ); ?></p>
-						<pre>
-{
-   "Version": "2012-10-17",
-   "Statement": [
-	  {
-		 "Effect": "Allow",
-		 "Action": [
-			"s3:DeleteObject",
-			"s3:GetObject",
-			"s3:ListBucket",
-			"s3:PutObject",
-			"s3:PutObjectAcl"
-		 ],
-		 "Resource": [            
-			"arn:aws:s3:::BUCKET_NAME",
-			"arn:aws:s3:::BUCKET_NAME/*"
-		 ]
-	  }
-   ]
-}
-						</pre>
-						<p><?php _e( '4. In your bucket\'s Permissions settings, add the following CORS policy to allow uploads from the browser: ', 's3sync' ); ?></p>
-						<pre>
-[
-	{
-		"AllowedHeaders": [
-			"*"
-		],
-		"AllowedMethods": [
-			"HEAD",
-			"GET",
-			"PUT",
-			"POST",
-			"DELETE"
-		],
-		"AllowedOrigins": [
-			"*"
-		],
-		"ExposeHeaders": [
-			"ETag"
-		]
-	}
-]
-						</pre>
-					</div>
-				</li>
-				<li class="amazons3_enable_setting field_setting">
+				<li class="amazons3_enable_setting field_setting" style="display:block !important">
 					<input type="checkbox" id="field_amazons3_enable" onclick="SetFieldProperty('enableS3Field', this.checked);" />
 					<label for="field_amazons3_enable" style="display:inline;">
 						<?php esc_html_e( 'Enable Uploads to S3', 's3sync' ); ?>

@@ -50,6 +50,10 @@ class S3Sync_AJAX_Uploader extends GF_Field {
 			// 'default_value_setting',
 			// 'visibility_setting',
 			'conditional_logic_field_setting',
+			'amazons3_unlink_setting ',
+			'amazons3_enable_setting',
+			'amazons3_secret_key_setting',
+			'amazons3_access_key_setting',
 			'amazons3_bucket_name_setting',
 			'amazons3_region_setting',
 			'amazons3_acl_setting',
@@ -94,7 +98,7 @@ class S3Sync_AJAX_Uploader extends GF_Field {
 	 *
 	 * @param  string|array 	$value      	The input value to be saved.
 	 * @param  array 			$form       	Form data.
-	 * @param  striing 			$input_name 	Input name attribute.
+	 * @param  string 			$input_name 	Input name attribute.
 	 * @param  int 				$lead_id    	The ID of the entry currently being processed.
 	 * @param  array 			$lead       	The GF_Entry currently being processed.
 	 *

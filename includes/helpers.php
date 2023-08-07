@@ -126,8 +126,10 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param int 		$form_id 		ID of the form
 		 * @param array 	$entry 			Entry data
 		 */
-		$object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
-
+		$current_datetime = date( 'Y-m-d-H-i-s' );
+        $folder_name = "{$current_datetime}/";
+		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
+		$object_path = "form-{$form_id}/{$entry['id']}/{$folder_name}{$file_name}";
 		/**
 		 * Privacy setting for the file.
 		 * See https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl for possible ACL choices

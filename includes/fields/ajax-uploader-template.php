@@ -83,10 +83,15 @@
 		});
 
 		<?php
+			$current_datetime = date( 'Y-m-d-H-i-s' );
+			$folder_name = "{$current_datetime}/";
 			$upload_params = apply_filters( 's3sync_putobject_args', array(
 				'Bucket' 		=> $aws_keys['bucket_name'],
+				'Key'           => $folder_name,
 				'ACL'    		=> apply_filters( 's3sync_put_object_acl', $aws_keys['acl'], '', '', $field_id, $form_id, null ),
 			), '', null, $form_id );
+			
+	
 		?>
 
 		const processFile = function(file) {

@@ -3,9 +3,6 @@ use Aws\S3\S3Client;
 
 GFForms::include_addon_framework();
 
-// require_once('helpers.php');
-
-
 class S3SyncAddon extends GFAddOn {
 
 	protected $_version = S3SYNC_VERSION;
@@ -34,6 +31,15 @@ class S3SyncAddon extends GFAddOn {
 		}
 
 		return self::$_instance;    
+	}
+	/**
+	 * Include the field early so it is available when entry exports are being performed.
+	 */
+	public function pre_init() {
+		parent::pre_init();
+		if ( $this->is_gravityforms_supported() && class_exists( 'GF_Field' ) ) {
+			require_once( 'ajax-uploader-field.php' );
+		}
 	}
 
 	/**

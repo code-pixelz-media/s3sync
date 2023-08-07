@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: S3Sync for Gravity Forms
+ * Plugin Name: S3Sync Gravity Forms Addon
  * Plugin URI: https://codepixelzmedia.com.np/
  * Description: Push and sync Gravity Forms file uploads to your Amazon S3 buckets.
  * Version: 1.0.0

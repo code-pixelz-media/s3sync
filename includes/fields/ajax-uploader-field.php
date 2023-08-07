@@ -4,12 +4,12 @@ if ( ! class_exists( 'GFForms' ) ) {
 	die();
 }
 
-class SyncS3_AJAX_Uploader extends GF_Field {
+class S3Sync_AJAX_Uploader extends GF_Field {
 
 	/**
 	 * @var string $type The field type.
 	 */
-	public $type = 'syncs3_ajax_uploader';
+	public $type = 's3sync_ajax_uploader';
 
 	/**
 	 * Return the field title, for use in the form editor.
@@ -17,7 +17,7 @@ class SyncS3_AJAX_Uploader extends GF_Field {
 	 * @return string
 	 */
 	public function get_form_editor_field_title() {
-		return esc_attr__( 'S3 Uploader', 'syncs3' );
+		return esc_attr__( 'S3 Uploader', 's3sync' );
 	}
 
 	/**
@@ -110,7 +110,7 @@ class SyncS3_AJAX_Uploader extends GF_Field {
 
 		$s3_urls = array();
 
-		$settings = syncs3_get_aws_settings( $form, $this );
+		$settings = s3sync_get_aws_settings( $form, $this );
 		foreach ( $files_json as $file ) {
 			$reference_data = array(
 				'file_url' => $file['Location'],
@@ -172,15 +172,15 @@ class SyncS3_AJAX_Uploader extends GF_Field {
 		$disabled_text         = $is_form_editor ? 'disabled="disabled"' : '';
 
 		// Prepare the input tag for this field.
-		$input = "<input name='input_{$id}' id='syncs3_ajax_uploader_{$field_id}' type='hidden' value='{$value}' class='{$class}' {$required_attribute} {$invalid_attribute} {$disabled_text}/>";
+		$input = "<input name='input_{$id}' id='s3sync_ajax_uploader_{$field_id}' type='hidden' value='{$value}' class='{$class}' {$required_attribute} {$invalid_attribute} {$disabled_text}/>";
 
-		$aws_keys = syncs3_get_aws_settings( $form, $this );
-		$upload_action = syncs3_get_upload_action( $this );
-		$path_js = apply_filters( 'syncs3_ajax_uploader_object_path_js', 'file.name', $this, $form, $entry );
+		$aws_keys = s3sync_get_aws_settings( $form, $this );
+		$upload_action = s3sync_get_upload_action( $this );
+		$path_js = apply_filters( 's3sync_ajax_uploader_object_path_js', 'file.name', $this, $form, $entry );
 		ob_start();
 		include 'ajax-uploader-template.php';
 		return ob_get_clean();
 	}
 }
 
-GF_Fields::register( new SyncS3_AJAX_Uploader() );
+GF_Fields::register( new S3Sync_AJAX_Uploader() );

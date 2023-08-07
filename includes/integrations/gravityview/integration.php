@@ -1,6 +1,6 @@
 <?php
 
-class SyncS3_Integration_GravityView {
+class S3Sync_Integration_GravityView {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'init' ) );
@@ -54,14 +54,14 @@ class SyncS3_Integration_GravityView {
 				if ( ! empty( $s3_field['endpoint'] ) ) {
 					$client_config['endpoint'] = $s3_field['endpoint'];
 				}
-				$path = syncs3_create_s3_request( array(
-					'client' => syncs3_s3_client( $client_config, $entry ),
+				$path = s3sync_create_s3_request( array(
+					'client' => s3sync_s3_client( $client_config, $entry ),
 					'presigned' => true,
 					'url' => array(
 						'bucket' => $s3_field['bucket'],
 						'key' => $s3_field['key']
 					),
-					'filter' => 'syncs3_gravityview_presigned_link_time',
+					'filter' => 's3sync_gravityview_presigned_link_time',
 					'filter_value' => '+20 minutes',
 					'filter_args' => array(
 						'entry' => $entry,
@@ -100,9 +100,9 @@ class SyncS3_Integration_GravityView {
 				continue;
 			}
 
-			$uploaded = syncs3_send_entry_files_to_s3( $entry, $form['id'], $field->id, syncs3_get_aws_settings( $form, $field ), $field->amazonS3UnlinkField );
+			$uploaded = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, s3sync_get_aws_settings( $form, $field ), $field->amazonS3UnlinkField );
 		}
 	}
 }
 
-new SyncS3_Integration_GravityView;
+new S3Sync_Integration_GravityView;

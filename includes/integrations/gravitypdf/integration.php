@@ -1,6 +1,6 @@
 <?php
 
-class SyncS3_Integration_GravityPDF {
+class S3Sync_Integration_GravityPDF {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'init' ) );
@@ -35,15 +35,15 @@ class SyncS3_Integration_GravityPDF {
 		?>
 		<script>
 			jQuery(document).ready(function($) {
-				var enabledSetting = document.getElementById('gfpdf_settings[syncs3_gravitypdf_upload_pdf]');
+				var enabledSetting = document.getElementById('gfpdf_settings[s3sync_gravitypdf_upload_pdf]');
 				console.log(enabledSetting);
-				$.each( $('.syncs3-gravitypdf-required'), function(index, el) {
+				$.each( $('.s3sync-gravitypdf-required'), function(index, el) {
 					if ( ! enabledSetting.checked ) {
 						$(el).hide();
 					}
 				} );
 				enabledSetting.addEventListener('change', function(index, el) {
-					$.each( $('.syncs3-gravitypdf-required'), function(index, el) {
+					$.each( $('.s3sync-gravitypdf-required'), function(index, el) {
 						if ( ! enabledSetting.checked ) {
 							$(el).hide();
 						} else {
@@ -64,104 +64,104 @@ class SyncS3_Integration_GravityPDF {
 	 * @return void
 	 */
 	public function add_settings( $settings ) {
-		$settings['syncs3_gravitypdf_upload_pdf'] = array(
-			'id'         => 'syncs3_gravitypdf_upload_pdf',
-			'name'       => esc_html__( 'Upload PDF to S3?', 'syncs3' ),
+		$settings['s3sync_gravitypdf_upload_pdf'] = array(
+			'id'         => 's3sync_gravitypdf_upload_pdf',
+			'name'       => esc_html__( 'Upload PDF to S3?', 's3sync' ),
 			'type'    	 => 'checkbox',
-			'desc' 		 => esc_html__( 'Upload PDF to Amazon S3', 'syncs3' ),
+			'desc' 		 => esc_html__( 'Upload PDF to Amazon S3', 's3sync' ),
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Upload PDF to Amazon S3', 'syncs3' ),
-				esc_html__( 'When enabled, SyncS3 will push the PDF to your Amazon S3 bucket.', 'syncs3' )
+				esc_html__( 'Upload PDF to Amazon S3', 's3sync' ),
+				esc_html__( 'When enabled, S3Sync will push the PDF to your Amazon S3 bucket.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_unlink'] = array(
-			'id'         => 'syncs3_gravitypdf_unlink',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'name'       => esc_html__( 'Delete Local PDF', 'syncs3' ),
+		$settings['s3sync_gravitypdf_unlink'] = array(
+			'id'         => 's3sync_gravitypdf_unlink',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'name'       => esc_html__( 'Delete Local PDF', 's3sync' ),
 			'type'    	 => 'checkbox',
-			'desc' 		 => esc_html__( 'Delete local file after uploading to S3?', 'syncs3' ),
+			'desc' 		 => esc_html__( 'Delete local file after uploading to S3?', 's3sync' ),
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Delete Local PDF', 'syncs3' ),
-				esc_html__( 'When enabled, SyncS3 will delete the local copy of the PDF after it is uploaded to your S3 bucket.', 'syncs3' )
+				esc_html__( 'Delete Local PDF', 's3sync' ),
+				esc_html__( 'When enabled, S3Sync will delete the local copy of the PDF after it is uploaded to your S3 bucket.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_unlink'] = array(
-			'id'         => 'syncs3_gravitypdf_unlink',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'name'       => esc_html__( 'Delete Local PDF', 'syncs3' ),
+		$settings['s3sync_gravitypdf_unlink'] = array(
+			'id'         => 's3sync_gravitypdf_unlink',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'name'       => esc_html__( 'Delete Local PDF', 's3sync' ),
 			'type'    	 => 'checkbox',
-			'desc' 		 => esc_html__( 'Delete local file after uploading to S3?', 'syncs3' ),
+			'desc' 		 => esc_html__( 'Delete local file after uploading to S3?', 's3sync' ),
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Delete Local PDF', 'syncs3' ),
-				esc_html__( 'When enabled, SyncS3 will delete the local copy of the PDF after it is uploaded to your S3 bucket.', 'syncs3' )
+				esc_html__( 'Delete Local PDF', 's3sync' ),
+				esc_html__( 'When enabled, S3Sync will delete the local copy of the PDF after it is uploaded to your S3 bucket.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_access_key'] = array(
-			'id'         => 'syncs3_gravitypdf_access_key',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'desc' 		 => esc_html__( 'Defaults to the form\'s SyncS3 settings if available, or the global SyncS3 settings.' ),
-			'name'       => esc_html__( 'Access Key', 'syncs3' ),
+		$settings['s3sync_gravitypdf_access_key'] = array(
+			'id'         => 's3sync_gravitypdf_access_key',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'desc' 		 => esc_html__( 'Defaults to the form\'s S3Sync settings if available, or the global S3Sync settings.' ),
+			'name'       => esc_html__( 'Access Key', 's3sync' ),
 			'type'    	 => 'text',
 			'inputClass' => 'large',
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Access Key', 'syncs3' ),
-				esc_html__( 'Your Amazon AWS Access Key. This allows you to send files to any Amazon S3 account.', 'syncs3' )
+				esc_html__( 'Access Key', 's3sync' ),
+				esc_html__( 'Your Amazon AWS Access Key. This allows you to send files to any Amazon S3 account.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_secret_key'] = array(
-			'id'         => 'syncs3_gravitypdf_secret_key',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'desc' 		 => esc_html__( 'Defaults to the form\'s SyncS3 settings if available, or the global SyncS3 settings.' ),
-			'name'       => esc_html__( 'Secret Key', 'syncs3' ),
+		$settings['s3sync_gravitypdf_secret_key'] = array(
+			'id'         => 's3sync_gravitypdf_secret_key',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'desc' 		 => esc_html__( 'Defaults to the form\'s S3Sync settings if available, or the global S3Sync settings.' ),
+			'name'       => esc_html__( 'Secret Key', 's3sync' ),
 			'type'    	 => 'text',
 			'inputClass' => 'large',
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Secret Key', 'syncs3' ),
-				esc_html__( 'Your Amazon AWS Secret Key. This allows you to send files to any Amazon S3 account.', 'syncs3' )
+				esc_html__( 'Secret Key', 's3sync' ),
+				esc_html__( 'Your Amazon AWS Secret Key. This allows you to send files to any Amazon S3 account.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_bucket_name'] = array(
-			'id'         => 'syncs3_gravitypdf_bucket_name',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'desc' 		 => esc_html__( 'Defaults to the form\'s SyncS3 settings if available, or the global SyncS3 settings.' ),
-			'name'       => esc_html__( 'Bucket Name', 'syncs3' ),
+		$settings['s3sync_gravitypdf_bucket_name'] = array(
+			'id'         => 's3sync_gravitypdf_bucket_name',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'desc' 		 => esc_html__( 'Defaults to the form\'s S3Sync settings if available, or the global S3Sync settings.' ),
+			'name'       => esc_html__( 'Bucket Name', 's3sync' ),
 			'type'    	 => 'text',
 			'inputClass' => 'large',
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Bucket Name', 'syncs3' ),
-				esc_html__( 'Bucket to which the files should be added.', 'syncs3' )
+				esc_html__( 'Bucket Name', 's3sync' ),
+				esc_html__( 'Bucket to which the files should be added.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_region'] = array(
-			'id'         => 'syncs3_gravitypdf_region',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'desc' 		 => esc_html__( 'Defaults to the form\'s SyncS3 settings if available, or the global SyncS3 settings.' ),
-			'name'       => esc_html__( 'Region', 'syncs3' ),
+		$settings['s3sync_gravitypdf_region'] = array(
+			'id'         => 's3sync_gravitypdf_region',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'desc' 		 => esc_html__( 'Defaults to the form\'s S3Sync settings if available, or the global S3Sync settings.' ),
+			'name'       => esc_html__( 'Region', 's3sync' ),
 			'type'    	 => 'select',
-			'options' 	 => syncs3_get_s3_regions( true ),
+			'options' 	 => s3sync_get_s3_regions( true ),
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Region', 'syncs3' ),
-				esc_html__( 'Region for the bucket.', 'syncs3' )
+				esc_html__( 'Region', 's3sync' ),
+				esc_html__( 'Region for the bucket.', 's3sync' )
 			),
 		);
-		$settings['syncs3_gravitypdf_endpoint'] = array(
-			'id'         => 'syncs3_gravitypdf_endpoint',
-			'class' 	 => 'syncs3-gravitypdf-required',
-			'desc' 		 => esc_html__( 'Defaults to the form\'s SyncS3 settings if available, or the global SyncS3 settings.' ),
-			'name'       => esc_html__( 'Endpoint', 'syncs3' ),
+		$settings['s3sync_gravitypdf_endpoint'] = array(
+			'id'         => 's3sync_gravitypdf_endpoint',
+			'class' 	 => 's3sync-gravitypdf-required',
+			'desc' 		 => esc_html__( 'Defaults to the form\'s S3Sync settings if available, or the global S3Sync settings.' ),
+			'name'       => esc_html__( 'Endpoint', 's3sync' ),
 			'type'    	 => 'text',
 			'inputClass' => 'large',
 			'tooltip'    => sprintf(
 				'<h6>%s</h6>%s',
-				esc_html__( 'Endpoint', 'syncs3' ),
-				esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it.', 'syncs3' )
+				esc_html__( 'Endpoint', 's3sync' ),
+				esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it.', 's3sync' )
 			),
 		);
 		return $settings;
@@ -183,14 +183,14 @@ class SyncS3_Integration_GravityPDF {
 		// $gfpdf->options->get_form_pdfs( $form_id );
 
 		// Bail if the form is not set to upload the PDF
-		if ( empty( $settings['syncs3_gravitypdf_upload_pdf'] ) ) {
+		if ( empty( $settings['s3sync_gravitypdf_upload_pdf'] ) ) {
 			return;
 		}
 
-		$keys = syncs3_get_aws_settings( $form );
-		$region = ! empty( $settings['syncs3_gravitypdf_region'] ) ? $settings['syncs3_gravitypdf_region'] : $keys['region'];
-		$access_key = ! empty( $settings['syncs3_gravitypdf_access_key'] ) ? $settings['syncs3_gravitypdf_access_key'] : $keys['access_key'];
-		$secret_key = ! empty( $settings['syncs3_gravitypdf_secret_key'] ) ? $settings['syncs3_gravitypdf_secret_key'] : $keys['secret_key'];
+		$keys = s3sync_get_aws_settings( $form );
+		$region = ! empty( $settings['s3sync_gravitypdf_region'] ) ? $settings['s3sync_gravitypdf_region'] : $keys['region'];
+		$access_key = ! empty( $settings['s3sync_gravitypdf_access_key'] ) ? $settings['s3sync_gravitypdf_access_key'] : $keys['access_key'];
+		$secret_key = ! empty( $settings['s3sync_gravitypdf_secret_key'] ) ? $settings['s3sync_gravitypdf_secret_key'] : $keys['secret_key'];
 
 		$client_config = array(
 			'version' => 'latest',
@@ -202,8 +202,8 @@ class SyncS3_Integration_GravityPDF {
 		);
 
 		// Overwrite the endpoint
-		if ( ! empty( $settings['syncs3_gravitypdf_endpoint'] ) ) {
-			$client_config['endpoint'] = $settings['syncs3_gravitypdf_endpoint'];
+		if ( ! empty( $settings['s3sync_gravitypdf_endpoint'] ) ) {
+			$client_config['endpoint'] = $settings['s3sync_gravitypdf_endpoint'];
 		} else if ( ! empty( $keys['endpoint'] ) ) {
 			$client_config['endpoint'] = $keys['endpoint'];
 		}
@@ -217,9 +217,9 @@ class SyncS3_Integration_GravityPDF {
 		 * @param array 	$entry 				Entry data
 		 * @param int 		$form 				Form data
 		 */
-		$client_config = apply_filters( 'syncs3_gravitypdf_s3_client_config', $client_config, $entry, $form );
+		$client_config = apply_filters( 's3sync_gravitypdf_s3_client_config', $client_config, $entry, $form );
 
-		$s3 = syncs3_s3_client( $client_config, $entry );
+		$s3 = s3sync_s3_client( $client_config, $entry );
 
 		/**
 		 * Bucket name.
@@ -232,7 +232,7 @@ class SyncS3_Integration_GravityPDF {
 		 * @param array		$form			Form data
 		 * @param array 	$entry 			Entry data
 		 */
-		$bucket_name = apply_filters( 'syncs3_gravitypdf_put_object_bucket_name', ! empty( $settings['syncs3_gravitypdf_bucket_name'] ) ? $settings['syncs3_gravitypdf_bucket_name'] : $keys['bucket_name'], $file_path, $file_name, $form, $entry );
+		$bucket_name = apply_filters( 's3sync_gravitypdf_put_object_bucket_name', ! empty( $settings['s3sync_gravitypdf_bucket_name'] ) ? $settings['s3sync_gravitypdf_bucket_name'] : $keys['bucket_name'], $file_path, $file_name, $form, $entry );
 
 		/**
 		 * File path relative to the bucket.
@@ -245,7 +245,7 @@ class SyncS3_Integration_GravityPDF {
 		 * @param array		$form 			Form data
 		 * @param array 	$entry 			Entry data
 		 */
-		$object_path = apply_filters( 'syncs3_gravitypdf_put_object_file_path', "form-{$form['id']}/{$entry['id']}/{$file_name}", $file_path, $file_name, $form, $entry );
+		$object_path = apply_filters( 's3sync_gravitypdf_put_object_file_path', "form-{$form['id']}/{$entry['id']}/{$file_name}", $file_path, $file_name, $form, $entry );
 
 		// Send the file to S3 bucket
 		try {
@@ -254,7 +254,7 @@ class SyncS3_Integration_GravityPDF {
 				'Key'    => $object_path,
 				'Body'   => fopen( $file_path, 'r' ),
 				// See https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl for possible ACL choices
-				'ACL'    => apply_filters( 'syncs3_gravitypdf_put_object_acl', 'private', $file_path, $file_name, $form, $entry ),
+				'ACL'    => apply_filters( 's3sync_gravitypdf_put_object_acl', 'private', $file_path, $file_name, $form, $entry ),
 			]);
 		} catch (Aws\S3\Exception\S3Exception $e) {
 			error_log( "There was an error uploading the PDF.\n{$e->getMessage()}" );
@@ -272,19 +272,19 @@ class SyncS3_Integration_GravityPDF {
 				'secret_key' => $secret_key,
 			);
 
-			if ( ! empty( $settings['syncs3_gravitypdf_endpoint'] ) ) {
-				$reference_data['endpoint'] = $settings['syncs3_gravitypdf_endpoint'];
+			if ( ! empty( $settings['s3sync_gravitypdf_endpoint'] ) ) {
+				$reference_data['endpoint'] = $settings['s3sync_gravitypdf_endpoint'];
 			} else if ( ! empty( $keys['endpoint'] ) ) {
 				$reference_data['endpoint'] = $keys['endpoint'];
 			}
 
-			$reference_data = apply_filters( 'syncs3_gravitypdf_pdf_reference_data', $reference_data, $entry, $form );
+			$reference_data = apply_filters( 's3sync_gravitypdf_pdf_reference_data', $reference_data, $entry, $form );
 
 			// Store the reference data to the PDF in S3
-			gform_update_meta( $entry['id'], 'syncs3_gravitypdf_pdf_s3_data', $reference_data );
+			gform_update_meta( $entry['id'], 's3sync_gravitypdf_pdf_s3_data', $reference_data );
 
 			// Delete the local PDF if enabled
-			if ( ! empty( $settings['syncs3_gravitypdf_unlink'] ) ) {
+			if ( ! empty( $settings['s3sync_gravitypdf_unlink'] ) ) {
 				unlink( $file_path );
 			}
 		}
@@ -304,7 +304,7 @@ class SyncS3_Integration_GravityPDF {
 	 */
 	public function filter_pdf_url( $url, $pid, $entry_id, $download, $print, $esc ) {
 		
-		$entry_meta = gform_get_meta( $entry_id, 'syncs3_gravitypdf_pdf_s3_data' );
+		$entry_meta = gform_get_meta( $entry_id, 's3sync_gravitypdf_pdf_s3_data' );
 		
 		if ( ! empty( $entry_meta ) ) {
 
@@ -323,14 +323,14 @@ class SyncS3_Integration_GravityPDF {
 			if ( ! empty( $entry_meta['endpoint'] ) ) {
 				$client_config['endpoint'] = $entry_meta['endpoint'];
 			}
-			$url = syncs3_create_s3_request( array(
-				'client' => syncs3_s3_client( $client_config, $entry ),
+			$url = s3sync_create_s3_request( array(
+				'client' => s3sync_s3_client( $client_config, $entry ),
 				'presigned' => true,
 				'url' => array(
 					'bucket' => $entry_meta['bucket'],
 					'key' => $entry_meta['key']
 				),
-				'filter' => 'syncs3_presigned_link_time',
+				'filter' => 's3sync_presigned_link_time',
 				'filter_value' => '+20 minutes',
 				'filter_args' => array(
 					'entry' => $entry,
@@ -343,4 +343,4 @@ class SyncS3_Integration_GravityPDF {
 	}
 }
 
-new SyncS3_Integration_GravityPDF;
+new S3Sync_Integration_GravityPDF;

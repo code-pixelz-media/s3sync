@@ -47,8 +47,6 @@ class S3SyncAddon extends GFAddOn {
 	 */
 	public function init() {
 		parent::init();
-		
-
 		add_action( 'gform_entry_created', array( $this, 'process_entry' ), 10, 2 );
 		add_action( 'gform_field_advanced_settings', array( $this, 'upload_field_settings' ), 10, 2 );
 		add_action( 'gform_editor_js', array( $this, 'editor_script' ) );
@@ -103,20 +101,6 @@ class S3SyncAddon extends GFAddOn {
 						'choices' => s3sync_get_s3_acls( true, true ),
 						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. This can be overridden on a form and field level.', 's3sync' ),
 					),
-					array(
-						'name' => 'amazons3_endpoint',
-						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 's3sync' ),
-						'label' => esc_html__( 'Endpoint', 's3sync' ),
-						'type' => 'text',
-						'class' => 'medium',
-					),
-					array(
-						'name' => 'amazons3_identity_pool_id',
-						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader.', 's3sync' ),
-						'label' => esc_html__( 'Identity Pool ID', 's3sync' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
 
 				)
 			)
@@ -168,20 +152,7 @@ class S3SyncAddon extends GFAddOn {
 						'choices' => s3sync_get_s3_acls( true, true ),
 						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.', 's3sync' ),
 					),
-					array(
-						'name' => 'amazons3_endpoint',
-						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 's3sync' ),
-						'label' => esc_html__( 'Endpoint', 's3sync' ),
-						'type' => 'text',
-						'class' => 'medium',
-					),
-					array(
-						'label' => esc_html__( 'Identity Pool ID', 's3sync' ),
-						'type' => 'text',
-						'name' => 'amazons3_identity_pool_id',
-						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader. This will override the global setting. If left empty, the global setting will be used. This can also be overridden from the field level.', 's3sync' ),
-						'class' => 'large'
-					),
+
 				),
 			),
 		);
@@ -283,20 +254,6 @@ class S3SyncAddon extends GFAddOn {
 						<?php endforeach; ?>
 					</select>
 				</li>
-				<li class="amazons3_endpoint_setting field_setting">
-					<label for="field_amazons3_endpoint" class="section_label">
-						<?php esc_html_e( 'Endpoint', 's3sync' ); ?>
-						<?php gform_tooltip( 'form_field_amazons3_endpoint' ) ?>
-					</label>
-					<input type="url" value="" id="field_amazons3_endpoint" size="35" onchange="SetFieldProperty('amazonS3EndpointField', this.value);" />
-				</li>
-				<li class="amazons3_identity_pool_id_setting field_setting">
-					<label for="field_amazons3_identity_pool_id" class="section_label">
-						<?php esc_html_e( 'Identity Pool ID', 's3sync' ); ?>
-						<?php gform_tooltip( 'form_field_amazons3_identity_pool_id' ) ?>
-					</label>
-					<input type="text" value="" id="field_amazons3_identity_pool_id" size="35" onchange="SetFieldProperty('amazonS3IdentityPoolIdField', this.value);" />
-				</li>
 				<li class="amazons3_max_files_setting field_setting">
 					<label for="field_amazons3_max_files" class="section_label">
 						<?php esc_html_e( 'Maximum Number of Files', 's3sync' ); ?>
@@ -349,8 +306,6 @@ class S3SyncAddon extends GFAddOn {
 				jQuery("#field_amazons3_bucket_name").val(field["amazonS3BucketNameField"]);
 				jQuery("#field_amazons3_region").val(field["amazonS3RegionField"]);
 				jQuery("#field_amazons3_acl").val(field["amazonS3AclField"]);
-				jQuery("#field_amazons3_endpoint").val(field["amazonS3EndpointField"]);
-				jQuery("#field_amazons3_identity_pool_id").val(field["amazonS3IdentityPoolIdField"]);
 				jQuery("#field_amazons3_max_files").val(field["amazonS3MaxFilesField"]);
 				jQuery("#field_amazons3_accepted_files").val(field["amazonS3AcceptedFilesField"]);
 				jQuery("#field_amazons3_upload_action").val(field["amazonS3UploadActionField"]);
@@ -384,8 +339,6 @@ class S3SyncAddon extends GFAddOn {
 		$tooltips['form_field_amazons3_bucket_name'] = __( "<h6>Bucket Name</h6>Bucket to which the files should be added. If left empty, the global setting will be used.", 's3sync' );
 		$tooltips['form_field_amazons3_region'] = __( "<h6>Region</h6>Region for the bucket. If left empty, the global setting will be used.", 's3sync' );
 		$tooltips['form_field_amazons3_acl'] = __( "<h6>ACL</h6>Amazon S3 supports a set of predefined grants, known as <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl\" target=\"_blank\">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. If left empty, the global setting will be used.", 's3sync' );
-		$tooltips['form_field_amazons3_endpoint'] = __( "<h6>Endpoint</h6>WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.", 's3sync' );
-		$tooltips['form_field_amazons3_identity_pool_id'] = __( "<h6>Identity Pool ID</h6>This will look something like: us-east-2:86dcc0b2-60bb-4001-a512-b643451a5b3e", 's3sync' );
 		$tooltips['form_field_amazons3_max_files'] = __( "<h6>Maximum Number of Files</h6>Limit the number of files that can be uploaded.", 's3sync' );
 		$tooltips['form_field_amazons3_accepted_files'] = __( "<h6>Accepted Files</h6>A comma separated list of mime types or file extensions.", 's3sync' );
 		$tooltips['form_field_amazons3_upload_action'] = __( "<h6>Upload Action</h6>When the files should be uploaded. <strong>File Select</strong> - When the user selects their files. <strong>Form Submit</strong> - When the user submits the form.", 's3sync' );

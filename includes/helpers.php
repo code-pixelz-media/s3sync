@@ -99,11 +99,13 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		// Grab the file name
 		$file_parts = explode( '/', $file_path );
 		$file_name = array_pop( $file_parts );
-
+		$current_datetime = date( 'Y-m-d-H-i-s' );
+        $folder_name = "{$current_datetime}/";
+        
 		$bucket_name = apply_filters( 's3sync_put_object_bucket_name', $keys['bucket_name'], $file, $file_name, $field_id, $form_id, $entry );
 
 
-		$object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
+		$object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$folder_name}{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 
 
 		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
@@ -425,8 +427,7 @@ function s3sync_get_aws_settings( $form = array(), $field = false ) {
 		'bucket_name' => s3sync_get_aws_bucket_name( $form, $field ),
 		'region' => s3sync_get_aws_region( $form, $field ),
 		'acl' => s3sync_get_aws_acl( $form, $field ),
-		'endpoint' => s3sync_get_aws_endpoint( $form, $field ),
-		'identity_pool_id' => s3sync_get_aws_identity_pool_id( $form, $field )
+
 	);
 }
 

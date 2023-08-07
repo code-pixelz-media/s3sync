@@ -81,7 +81,7 @@ if (!class_exists('S3Sync')):
         public static function autoload()
         {
             if (!class_exists('Aws\AwsClient')) {
-                require 'lib/vendor/autoload.php';
+                require 'lib/aws/vendor/autoload.php';
 
             }
         }
@@ -153,7 +153,7 @@ function S3Sync()
 }
 
 
-add_action( 'plugins_loaded', 'syncs3_bootstrap', 1 );
+add_action( 'plugins_loaded', 's3sync_bootstrap', 1 );
 /**
  * Function to intialize plugin on plugins_loaded hook
  *  

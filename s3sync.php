@@ -153,7 +153,7 @@ function S3Sync()
 }
 
 
-add_action( 'plugins_loaded', 'syncs3_bootstrap', 1 );
+add_action( 'plugins_loaded', 's3sync_bootstrap', 1 );
 /**
  * Function to intialize plugin on plugins_loaded hook
  *  

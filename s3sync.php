@@ -81,7 +81,7 @@ if (!class_exists('S3Sync')):
         public static function autoload()
         {
             if (!class_exists('Aws\AwsClient')) {
-                require 'lib/vendor/autoload.php';
+                require 'lib/aws/vendor/autoload.php';
 
             }
         }

@@ -29,6 +29,8 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	// Each form has its own upload path and URL
 	$upload_path = GFFormsModel::get_upload_path( $form_id );
 	$upload_url = GFFormsModel::get_upload_url( $form_id );
+	$current_datetime = date( 'Y-m-d-H-i-s' );
+    $folder_name = "{$current_datetime}/";
 
 	// Loop through these if multi-file upload
 	$files = 0 === strpos( $entry[$field_id], '{' ) || 0 === strpos( $entry[$field_id], '[' ) ? json_decode( $entry[$field_id], true ) : $entry[$field_id];
@@ -126,8 +128,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param int 		$form_id 		ID of the form
 		 * @param array 	$entry 			Entry data
 		 */
-		$current_datetime = date( 'Y-m-d-H-i-s' );
-        $folder_name = "{$current_datetime}/";
+
 		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}/{$folder_name}", $file, $file_name, $field_id, $form_id, $entry );
 		/**
@@ -144,17 +145,22 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param array 	$entry 			Entry data
 		 */
 		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
-
+		
+		$current_datetime = date( 'Y-m-d-H-i-s');
+		$folder_name = "{$current_datetime}/";
 		// Send the file to S3 bucket
 		// https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		try {
+		
+
 			$args = apply_filters( 's3sync_putobject_args', array(
 				'Bucket' 		=> $bucket_name,
-				'Key'    		=> $object_path,
+				'Key'    		=> $folder_name.$file_name,
 				'ContentLength' => filesize( $file_path ),
 				'Body'   		=> fopen( $file_path, 'r' ),
 				'ACL'    		=> $acl,
 			), $file, $entry, $form_id );
+			
 			$result = $s3->putObject( $args );
 		} catch (Throwable $e) {
 			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
@@ -165,7 +171,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			// Store a reference to the file's S3 URL
 			$reference_data = array(
 				'file_url' => $result['ObjectURL'],
-				'key' => $object_path,
+				'key' => $folder_name.$file_name,
 				'region' => $keys['region'],
 				'bucket' => $bucket_name,
 				'acl' => $acl,
@@ -822,3 +828,6 @@ function s3sync_get_accepted_files( $field = false ) {
 function s3sync_get_upload_action( $field = false ) {
 	return ! empty( $field->amazonS3UploadActionField ) ? sanitize_text_field( $field->amazonS3UploadActionField ) : '';
 }
+
+
+

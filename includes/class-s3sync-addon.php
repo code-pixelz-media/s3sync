@@ -31,21 +31,11 @@ class S3SyncAddon extends GFAddOn {
 	}
 
 	/**
-	 * Include the field early so it is available when entry exports are being performed.
-	 */
-	public function pre_init() {
-		parent::pre_init();
-		if ( $this->is_gravityforms_supported() && class_exists( 'GF_Field' ) ) {
-			require_once( 'fields/ajax-uploader-field.php' );
-		}
-	}
-
-	/**
 	 * Handles hooks and loading of language files.
 	 */
 	public function init() {
 		parent::init();
-		add_action( 'gform_enqueue_scripts', 'S3SyncAddon::frontend_scripts', 10, 2 );
+		add_action( 'gform_enqueue_scripts', 'S3SyncAddon::gfforms_frontend_scripts', 10, 2 );
 		add_action( 'gform_entry_created', 'S3SyncAddon::process_entry', 999, 2 );
 		add_action( 'gform_field_advanced_settings', array( $this, 'upload_field_settings' ), 10, 2 );
 		add_action( 'gform_editor_js', array( $this, 'editor_script' ) );
@@ -57,8 +47,6 @@ class S3SyncAddon extends GFAddOn {
 		add_action( 'wp_ajax_nopriv_rg_delete_file', array( $this, 'remove_files_from_s3' ), 99 );
 		add_action( 'wp_ajax_rg_delete_file', array( $this, 'remove_files_from_s3' ), 5 );
 		add_filter( 'gform_submit_button', array( $this, 'prepend_uploading_notification' ), 99, 2 );
-
-		// add_filter( 'gform_export_fields', array( $this, 'csv_export_column' ) );
 		add_filter( 'gform_export_field_value', array( $this, 'csv_export_values' ), 10, 4 );
 	}
 
@@ -78,7 +66,7 @@ class S3SyncAddon extends GFAddOn {
 		return $button;
 	}
 
-	public static function frontend_scripts( $form, $ajax ) {
+	public static function gfforms_frontend_scripts( $form, $ajax ) {
 		if ( s3sync_form_has_uploader( $form ) ) {
 			$aws_version = '2.869.0';
 			$dz_version = '5.8.1';
@@ -89,87 +77,6 @@ class S3SyncAddon extends GFAddOn {
 		}
 	}
 
-	/**
-	 * Return the plugin's icon for the plugin/form settings menu.
-	 *
-	 * @since 1.3
-	 *
-	 * @return string
-	 */
-	public function get_menu_icon() {
-		return '<svg style="max-width:1rem;" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 55 57" xmlns="http://www.w3.org/2000/svg"><g fill-rule="nonzero" transform="translate(-22.641 -21.806)"><path d="m22.812 35.714c-.107-.234-.17-.475-.17-.715z"/><path d="m77.188 35.714.17-.715c0 .24-.058.479-.17.715z"/><path d="m77.358 32.671v2.328l-.17.715v-2.326z"/><path d="m22.812 33.388v2.326l-.17-.715v-2.328z"/><g><path d="m77.358 28.229v2.327c0 .084-.01.167-.023.251v-2.324c.014-.084.023-.17.023-.254"/><path d="m77.335 28.483v2.324c-.014.1-.041.197-.076.295v-2.328c.035-.095.062-.193.076-.291"/><path d="m77.259 28.774v2.328c-.045.133-.111.267-.193.399v-2.325c.081-.13.148-.265.193-.402"/><path d="m77.065 29.177v2.325c-1.943 3.112-13.32 5.483-27.07 5.483-15.105 0-27.354-2.868-27.354-6.429v-2.327c0 3.562 12.248 6.431 27.354 6.431 13.75 0 25.127-2.372 27.07-5.483"/></g><path d="m49.995 21.806c15.113 0 27.363 2.877 27.363 6.424 0 3.562-12.25 6.431-27.363 6.431-15.105 0-27.354-2.868-27.354-6.431.001-3.547 12.249-6.424 27.354-6.424z"/><path d="m77.188 33.388v2.326l-8.947 38.195v-2.322z"/><path d="m31.761 71.587v2.322l-8.949-38.195v-2.326z"/><g><path d="m68.241 71.587v2.322c0 .06-.006.115-.018.172v-2.329c.012-.054.018-.11.018-.165"/><path d="m68.224 71.752v2.329c-.006.063-.027.129-.047.193v-2.325c.019-.067.041-.13.047-.197"/><path d="m68.177 71.949v2.325c-.033.09-.078.179-.131.268v-2.329c.053-.085.098-.174.131-.264"/><path d="m68.046 72.213v2.329c-1.295 2.072-8.879 3.652-18.051 3.652-10.07 0-18.234-1.911-18.234-4.285v-2.322c0 2.372 8.164 4.28 18.234 4.28 9.172 0 16.756-1.581 18.051-3.654"/></g><path d="m49.995 39.095c14.088 0 25.684-2.49 27.193-5.707l-8.947 38.199c0 2.372-8.166 4.28-18.246 4.28-10.07 0-18.234-1.908-18.234-4.28l-8.949-38.199c1.511 3.216 13.105 5.707 27.183 5.707z"/><path d="m77.42 32.668c.014.036.021.073.036.109l-.014-.063c-.006-.016-.016-.031-.022-.046z"/><path d="m77.391 32.579c-.022-.066-.044-.135-.059-.201.014.067.037.135.059.201z" fill="#146eb4"/></g></svg>';
-	}
-
-	/**
-	 * Configures the settings which should be rendered on the add-on settings tab.
-	 *
-	 * @return array
-	 */
-	public function plugin_settings_fields() {
-		return array(
-			array(
-				'title'  => esc_html__( 'S3Sync Settings', 's3sync' ),
-				'icon' => 'dashicons-media-document',
-				'fields' => array(
-					array(
-						'name' => 'amazons3_access_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Access Key.', 's3sync' ),
-						'label' => esc_html__( 'Access Key', 's3sync' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
-					array(
-						'name' => 'amazons3_secret_key',
-						'tooltip' => esc_html__( 'Your Amazon AWS Secret Key.', 's3sync' ),
-						'label' => esc_html__( 'Secret Key', 's3sync' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
-					array(
-						'name' => 'amazons3_bucket_name',
-						'tooltip' => esc_html__( 'Default bucket name. This can be overridden on a form and field level.', 's3sync' ),
-						'label' => esc_html__( 'Default Bucket', 's3sync' ),
-						'type' => 'text',
-						'class' => 'medium'
-					),
-					array(
-						'name' => 'amazons3_region',
-						'label' => esc_html__( 'Region', 's3sync' ),
-						'type' => 'select_custom',
-						'choices' => s3sync_get_s3_regions( true, true )
-					),
-					array(
-						'name' => 'amazons3_acl',
-						'label' => esc_html__( 'ACL', 's3sync' ),
-						'type' => 'select_custom',
-						'choices' => s3sync_get_s3_acls( true, true ),
-						'tooltip' => esc_html__( 'Amazon S3 supports a set of predefined grants, known as <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl" target="_blank">canned ACLs</a>. Each canned ACL has a predefined set of grantees and permissions. This can be overridden on a form and field level.', 's3sync' ),
-					),
-					array(
-						'name' => 'amazons3_endpoint',
-						'tooltip' => esc_html__( 'WARNING: Do NOT add anything here unless you have a specific reason for it. This overwrites the default Amazon AWS endpoint.', 's3sync' ),
-						'label' => esc_html__( 'Endpoint', 's3sync' ),
-						'type' => 'text',
-						'class' => 'medium',
-					),
-					array(
-						'name' => 'amazons3_identity_pool_id',
-						'tooltip' => esc_html__( 'For use with the "Direct to S3" uploader.', 's3sync' ),
-						'label' => esc_html__( 'Identity Pool ID', 's3sync' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
-					array(
-						'name' => 's3sync_license_key',
-						'tooltip' => esc_html__( 'Your S3Sync License Key.', 's3sync' ),
-						'label' => esc_html__( 'License Key', 's3sync' ),
-						'type' => 'text',
-						'class' => 'large'
-					),
-				)
-			)
-		);
-	}
 
 	/**
 	 * Configures the settings which should be rendered on the Form Settings > Simple Add-On tab.
@@ -178,7 +85,7 @@ class S3SyncAddon extends GFAddOn {
 	 *
 	 * @return array
 	 */
-	public function form_settings_fields( $form ) {
+	public function form_settings_fieldszzzz( $form ) {
 		return array(
 			array(
 				'title'  => esc_html__( 'S3Sync Settings', 's3sync' ),

@@ -130,7 +130,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 */
 
 		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
-		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}/{$folder_name}", $file, $file_name, $field_id, $form_id, $entry );
+		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}-{$folder_name}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 		/**
 		 * Privacy setting for the file.
 		 * See https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl for possible ACL choices
@@ -145,9 +145,6 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		 * @param array 	$entry 			Entry data
 		 */
 		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
-		
-		$current_datetime = date( 'Y-m-d-H-i-s');
-		$folder_name = "{$current_datetime}/";
 		// Send the file to S3 bucket
 		// https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		try {
@@ -155,7 +152,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 
 			$args = apply_filters( 's3sync_putobject_args', array(
 				'Bucket' 		=> $bucket_name,
-				'Key'    		=> $folder_name.$file_name,
+				'Key'    		=> $object_path,
 				'ContentLength' => filesize( $file_path ),
 				'Body'   		=> fopen( $file_path, 'r' ),
 				'ACL'    		=> $acl,
@@ -171,7 +168,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			// Store a reference to the file's S3 URL
 			$reference_data = array(
 				'file_url' => $result['ObjectURL'],
-				'key' => $folder_name.$file_name,
+				'key' => $object_path,
 				'region' => $keys['region'],
 				'bucket' => $bucket_name,
 				'acl' => $acl,

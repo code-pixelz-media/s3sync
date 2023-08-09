@@ -594,15 +594,7 @@ function s3sync_get_entry_s3_urls( $entry, $presigned = false ) {
 	return $returned_urls;
 }
 
-/**
- * Array of Amazon S3 ACLs.
- * See https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl for possible ACL choices
- *
- * @param  boolean $empty_option 	Whether to include an empty option value (for clearing the setting)
- * @param  boolean $as_choices 		Whether the regions are being used as options in a Gravity Forms select input
- *
- * @return array
- */
+
 function s3sync_get_s3_acls( $empty_option = false, $as_choices = false ) {
 	$acls = array(
 		'private' => __( 'Private', 's3sync' ),
@@ -632,15 +624,6 @@ function s3sync_get_s3_acls( $empty_option = false, $as_choices = false ) {
 
 	return $choices;
 }
-
-/**
- * Array of Amazon S3 regions
- *
- * @param  boolean $empty_option 	Whether to include an empty option value (for clearing the setting)
- * @param  boolean $as_choices 		Whether the regions are being used as options in a Gravity Forms select input
- *
- * @return array
- */
 function s3sync_get_s3_regions( $empty_option = false, $as_choices = false ) {
 	$regions = array(
 		'us-east-2' => __( 'US East (Ohio)', 's3sync' ),
@@ -691,17 +674,7 @@ function s3sync_get_s3_regions( $empty_option = false, $as_choices = false ) {
 	return $choices;
 }
 
-/**
- * Deletes a file from S3 bucket.
- *
- * @since 1.4.6
- *
- * @param  int 		$entry_id  	Entry ID
- * @param  int 		$field_id  	Field ID
- * @param  string 	$file_name 	Name of file to delete
- *
- * @return boolean True if file is deleted, else false
- */
+
 function s3sync_delete_file( $entry_id, $field_id, $file_name ) {
 	$s3_urls = gform_get_meta( $entry_id, 's3_urls' );
 

@@ -93,7 +93,7 @@ class S3Sync {
 	public function includes() {
 		include_once 'includes/helpers.php';
 	
-		include_once 'includes/class-rewrites.php';
+		// include_once 'includes/class-rewrites.php';
 
 	}
 

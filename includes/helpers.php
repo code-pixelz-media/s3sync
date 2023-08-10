@@ -161,6 +161,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			$result = $s3->putObject( $args );
 		} catch (Throwable $e) {
 			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
+			unlink( $file_path );
 		}
 
 		if ( ! empty( $result ) ) {

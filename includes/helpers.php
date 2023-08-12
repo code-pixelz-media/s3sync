@@ -89,6 +89,35 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
 
 		$api_status = [];
+		/**
+		 * File path relative to the bucket.
+		 *
+		 * @since 1.0.3
+		 *
+		 * @param string 	$path 			File path to return. Make sure the path ends with $file_name.
+		 * @param string 	$file 			Local file URL when uploaded
+		 * @param string 	$file_name 		Name of uploaded file
+		 * @param int 		$field_id 		ID of the fileupload field
+		 * @param int 		$form_id 		ID of the form
+		 * @param array 	$entry 			Entry data
+		 */
+
+		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
+		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
+		/**
+		 * Privacy setting for the file.
+		 * See https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl_overview.html#canned-acl for possible ACL choices
+		 *
+		 * @since 1.5.0
+		 *
+		 * @param string 	$acl 			Privacy setting.
+		 * @param string 	$file 			Local file URL when uploaded
+		 * @param string 	$file_name 		Name of uploaded file
+		 * @param int 		$field_id 		ID of the fileupload field
+		 * @param int 		$form_id 		ID of the form
+		 * @param array 	$entry 			Entry data
+		 */
+		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
 		// Send the file to S3 bucket
 		// https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		try {
@@ -119,6 +148,9 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		} catch (Aws\S3\Exception\S3Exception $e) {
 		
 			$api_status = ['status'=>false , 'message' => "There was an error uploading the file.\n{$e->getMessage()}"];
+		} catch (Throwable $e) {
+			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
+			unlink( $file_path );
 		}
 
 

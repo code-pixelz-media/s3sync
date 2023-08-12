@@ -93,7 +93,6 @@ class S3Sync {
 	public function includes() {
 		include_once 'includes/helpers.php';
 	
-		include_once 'includes/class-rewrites.php';
 
 	}
 
@@ -103,7 +102,7 @@ class S3Sync {
 	public function hooks() {
 		register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
-		add_action( 'init', array( $this, 'run_activation_stuff' ) );
+		add_action( 'init', array( $this, 'run_activation_tasks' ) );
 		add_action( 'plugins_loaded', array( $this, 'loaded' ) );
 		add_action( 'gform_loaded', array( $this, 'register_addon' ), 5 );
 	}
@@ -124,7 +123,7 @@ class S3Sync {
 	 *
 	 * @return void
 	 */
-	public function run_activation_stuff() {
+	public function run_activation_tasks() {
 		if ( true == get_option( 's3sync_run_activation', false ) ) {
 			flush_rewrite_rules();
 			delete_option( 's3sync_run_activation' );
@@ -190,3 +189,4 @@ add_action( 'plugins_loaded', 's3sync_bootstrap', 1 );
 function s3sync_bootstrap() {
 	s3sync();
 }
+

@@ -355,8 +355,14 @@ class S3SyncAddon extends GFAddOn {
 			if ( false === apply_filters( 's3sync_process_entry_should_process_field', true, $field, $entry, $form ) ) {
 				continue;
 			}
+		
+			$upload = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, s3sync_get_aws_settings( $form, $field ), $field->amazonS3UnlinkField );
+			$fieldobject = GFFormsModel::get_field($form, $field->id);
+			
+			// $addon_instance = new S3syncAddon();
 
-			s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, s3sync_get_aws_settings( $form, $field ), $field->amazonS3UnlinkField );
+			// // Call the set_field_error method on the instance
+			// $addon_instance->set_field_error($fieldobject, "hellow");
 		}
 	}
 
@@ -397,6 +403,7 @@ class S3SyncAddon extends GFAddOn {
 		// Get S3 URLs
 		$s3_urls = gform_get_meta( $args['entry']['id'], 's3_urls' );
 		
+	
 		?>
 		<?php if ( ! empty( $s3_urls ) ) : ?>
 			<table cellspacing="0" class="widefat fixed entry-detail-view">
@@ -406,7 +413,8 @@ class S3SyncAddon extends GFAddOn {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $s3_urls as $field_id => $urls ) : ?>
+				<!-- loop inside s3 fields  $urls stores an array $field_id =67-->
+					<?php foreach ( $s3_urls as $field_id => $urls ) :  ?>
 						<?php if ( ! empty( $urls ) ) : ?>
 							<?php $field = GFAPI::get_field( $args['form'], $field_id ); ?>
 							<tr>
@@ -415,7 +423,7 @@ class S3SyncAddon extends GFAddOn {
 							<tr>
 								<td colspan="2">
 									<ul>
-										<?php foreach ( $urls as $file_key => $url ) : ?>
+										<?php foreach ( $urls as $file_key => $url ) : var_dump($file_key); var_dump($url) ?>
 											<?php
 												$link = home_url( "/s3sync/{$args['entry']['id']}/{$field_id}/{$file_key}" );
 											?>

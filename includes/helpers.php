@@ -1,7 +1,7 @@
 <?php
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
-use Aws\Exception\AwsException;
+
 /**
  * Creates an AWS S3Client
  *

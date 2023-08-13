@@ -1,7 +1,7 @@
 ### S3Sync Gravity Form Addon
 
 ## Purpose
-  This gravity form addon is made for uploading files to Amazons3 without keeping it on the server.
+  This Gravity Forms addon facilitates direct file uploads to Amazon S3, eliminating the need for intermediate server storage.
 
 ## Description
   I have expanded the capabilities of Gravity Forms through the implementation of an addon framework. Within this framework, when users select the upload field option in Gravity Forms, they gain access to an array of advanced tabs. These tabs facilitate the seamless integration of Amazon S3 credentials into the form submission process.

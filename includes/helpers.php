@@ -30,8 +30,6 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	// Each form has its own upload path and URL
 	$upload_path = GFFormsModel::get_upload_path( $form_id );
 	$upload_url = GFFormsModel::get_upload_url( $form_id );
-	$current_datetime = date( 'Y-m-d-H-i-s' );
-    $folder_name = "{$current_datetime}/";
 
 	// Loop through these if multi-file upload
 	$files = 0 === strpos( $entry[$field_id], '{' ) || 0 === strpos( $entry[$field_id], '[' ) ? json_decode( $entry[$field_id], true ) : $entry[$field_id];
@@ -117,21 +115,11 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			$result = $s3->putObject( $args );
 		} catch (Throwable $e) {
 			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
-			unlink( $file_path );
+			if ( true === $unlink ) {
+				unlink( $file_path );
+			}
 		}
 
-
-		if(!$api_status['status']){
-			add_filter( 'gform_form_validation_errors', function ( $errors, $form ) {
-				    $errors[] = array(
-				        'field_label'    => 'the field label here',
-				        'field_selector' => '#field_1_10',
-				        'message'        => 'the error message here',
-				    );
- 
-			    return $errors;
-			}, 10, 2 );
-		}
 		if ( ! empty( $result ) && $api_status['status']) {
 
 			// Store a reference to the file's S3 URL
@@ -152,9 +140,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 
 			$s3_urls[$field_id][] = $reference_data;
 
-			if ( true === $unlink ) {
-				unlink( $file_path );
-			}
+		
 		}
 	}
 

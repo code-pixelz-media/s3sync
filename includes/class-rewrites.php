@@ -1,11 +1,11 @@
 <?php
 /**
- *	SyncS3 URL Rewrites
+ *	S3Sync URL Rewrites
  *
- *	@package SyncS3 for Gravity Forms
+ *	@package S3Sync for Gravity Forms
  */
 
-namespace SyncS3;
+namespace S3Sync;
 use WP_CLI, WP_CLI_Command, GFAPI, SyncS3Addon;
 
 // Exit if accessed directly

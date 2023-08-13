@@ -417,7 +417,7 @@ class S3SyncAddon extends GFAddOn {
 							<tr>
 								<td colspan="2">
 									<ul>
-										<?php foreach ( $urls as $file_key => $url ) : var_dump($file_key); var_dump($url) ?>
+										<?php foreach ( $urls as $file_key => $url ) :  ?>
 											<?php
 												$link = home_url( "/s3sync/{$args['entry']['id']}/{$field_id}/{$file_key}" );
 											?>
@@ -476,6 +476,7 @@ class S3SyncAddon extends GFAddOn {
 
 		// Get S3 URLs
 		$s3_url_fields = gform_get_meta( $entry['id'], 's3_urls' );
+		
 
 		foreach ( $merge_tag_matches[1] as $match ) {
 			

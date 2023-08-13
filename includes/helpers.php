@@ -83,7 +83,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 		/**
 		 * File path relative to the bucket.
 		 *
-		 * @since 1.0.3
+		 * @since unknown
 		 *
 		 * @param string 	$path 			File path to return. Make sure the path ends with $file_name.
 		 * @param string 	$file 			Local file URL when uploaded
@@ -157,7 +157,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 /**
  * Retrieves the correct Identity Pool ID.
  * 
- * @since 2.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -193,7 +193,7 @@ function s3sync_get_aws_identity_pool_id( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS Access Key.
  * 
- * @since 1.1.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -229,7 +229,7 @@ function s3sync_get_aws_access_key( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS Secret Key.
  * 
- * @since 1.1.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -265,7 +265,7 @@ function s3sync_get_aws_secret_key( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS Bucket name.
  * 
- * @since 1.1.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -301,7 +301,7 @@ function s3sync_get_aws_bucket_name( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS region.
  * 
- * @since 1.1.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -337,7 +337,7 @@ function s3sync_get_aws_region( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS ACL.
  * 
- * @since 1.5.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -373,7 +373,7 @@ function s3sync_get_aws_acl( $form = array(), $field = false ) {
 /**
  * Retrieves the correct AWS endpoint.
  * 
- * @since 1.2.2
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -409,7 +409,7 @@ function s3sync_get_aws_endpoint( $form = array(), $field = false ) {
 /**
  * Retrieves the full AWS config (keys, region, and bucket).
  * 
- * @since 1.5.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -431,7 +431,7 @@ function s3sync_get_aws_settings( $form = array(), $field = false ) {
 /**
  * Deprecated since 1.5.0.
  * 
- * @since 1.1.0
+ * @since unknown
  *
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
@@ -469,7 +469,7 @@ function s3sync_get_url_parts( $url ) {
 /**
  * Determines if a file has a public ACL.
  * 
- * @since  1.5.0
+ * @since unknown
  *
  * @param  array 	$file 	File data (saved in entry meta)
  *
@@ -482,7 +482,7 @@ function s3sync_is_file_public( $file ) {
 /**
  * Gets the S3 URLs of an entry
  *
- * @since 1.4.2
+ * @since unknown
  *
  * @param  mixed 	$entry 		Entry or Entry ID
  * @param  boolean 	$entry_id 	Whether to sign the URL (needed to access a protected file)
@@ -662,7 +662,7 @@ function s3sync_delete_file( $entry_id, $field_id, $file_name ) {
 /**
  * Gets a file's S3 URL.
  *
- * @since 1.4.7
+ * @since unknown
  *
  * @param  array 	$args  		Request data
  *
@@ -690,7 +690,7 @@ function s3sync_create_s3_request( $args ) {
 /**
  * Determine whether a form has a "Direct to S3" uploader field.
  * 
- * @since 1.6.0
+ * @since unknown
  *
  * @param  array 	$form 	Form data
  *
@@ -710,7 +710,7 @@ function s3sync_form_has_uploader( $form ) {
 /**
  * Retrieves the maximum number of files allowed for upload.
  * 
- * @since 1.6.0
+ * @since unknown
  *
  * @param  object 	$field 		Field object
  *
@@ -723,7 +723,7 @@ function s3sync_get_max_files( $field = false ) {
 /**
  * Retrieves a field's accepted files.
  * 
- * @since 1.6.0
+ * @since unknown
  *
  * @param  object 	$field 		Field object
  *
@@ -736,7 +736,7 @@ function s3sync_get_accepted_files( $field = false ) {
 /**
  * Retrieves a field's upload action.
  * 
- * @since 1.6.0
+ * @since unknown
  *
  * @param  object 	$field 		Field object
  *

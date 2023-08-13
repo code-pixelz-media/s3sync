@@ -1,6 +1,7 @@
 <?php
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
+use Aws\Exception\AwsException;
 /**
  * Creates an AWS S3Client
  *
@@ -81,7 +82,18 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 
 		$bucket_name = apply_filters( 's3sync_put_object_bucket_name', $keys['bucket_name'], $file, $file_name, $field_id, $form_id, $entry );
 
-
+		/**
+		 * File path relative to the bucket.
+		 *
+		 * @since 1.0.3
+		 *
+		 * @param string 	$path 			File path to return. Make sure the path ends with $file_name.
+		 * @param string 	$file 			Local file URL when uploaded
+		 * @param string 	$file_name 		Name of uploaded file
+		 * @param int 		$field_id 		ID of the fileupload field
+		 * @param int 		$form_id 		ID of the form
+		 * @param array 	$entry 			Entry data
+		 */
 
 		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
@@ -103,27 +115,24 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			), $file, $entry, $form_id );
 			
 			$result = $s3->putObject( $args );
-			
-			$result_arr =  $result->toArray(); 
-			
-			if(!empty($result_arr['ObjectURL'])) { 
-			
-				$api_status = ['status'=>true , 'message' => 'Success'];
-			
-				
-			} else { 
-			
-				$api_status = ['status'=>true , 'message' => 'Failed'];
-			} 
-
-		} catch (Aws\S3\Exception\S3Exception $e) {
-		
-			$api_status = ['status'=>false , 'message' => "There was an error uploading the file.\n{$e->getMessage()}"];
-		
+		} catch (Throwable $e) {
+			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
+			unlink( $file_path );
 		}
 
 
-		if ( ! empty( $result ) ) {
+		if(!$api_status['status']){
+			add_filter( 'gform_form_validation_errors', function ( $errors, $form ) {
+				    $errors[] = array(
+				        'field_label'    => 'the field label here',
+				        'field_selector' => '#field_1_10',
+				        'message'        => 'the error message here',
+				    );
+ 
+			    return $errors;
+			}, 10, 2 );
+		}
+		if ( ! empty( $result ) && $api_status['status']) {
 
 			// Store a reference to the file's S3 URL
 			$reference_data = array(

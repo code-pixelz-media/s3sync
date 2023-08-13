@@ -192,6 +192,7 @@ function s3sync_bootstrap() {
 }
 
 
+
 // add_filter( 'gform_field_validation', function ( $result, $value, $form, $field ) {
 //     if ( 'fileupload' === $field->type  ) {
 //         GFCommon::log_debug( __METHOD__ . '(): Running.' );

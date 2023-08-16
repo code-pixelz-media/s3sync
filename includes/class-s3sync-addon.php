@@ -355,8 +355,9 @@ class S3SyncAddon extends GFAddOn {
 			if ( false === apply_filters( 's3sync_process_entry_should_process_field', true, $field, $entry, $form ) ) {
 				continue;
 			}
-
-			$uploaded = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, s3sync_get_aws_settings( $form, $field ), $field->amazonS3UnlinkField );
+	
+			$settings =  s3sync_get_aws_settings( $form, $field );
+			$uploaded = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, $settings, $field->amazonS3UnlinkField );
 		}
 	}
 

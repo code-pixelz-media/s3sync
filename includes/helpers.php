@@ -115,12 +115,11 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			$result = $s3->putObject( $args );
 		} catch (Throwable $e) {
 			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
-			if ( true === $unlink ) {
-				unlink( $file_path );
-			}
+			GFCommon::log_error( " Upload Eror- message: {$e->getMessage()}" );
+			
 		}
 
-		if ( ! empty( $result ) && $api_status['status']) {
+		if ( ! empty( $result ) ) {
 
 			// Store a reference to the file's S3 URL
 			$reference_data = array(
@@ -140,11 +139,13 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 
 			$s3_urls[$field_id][] = $reference_data;
 
-		
+			GFCommon::log_error( "Meta array: {$reference_data}" );
 		}
 	}
 
 	$existing_urls = gform_get_meta( $entry['id'], 's3_urls' );
+	
+	GFCommon::log_error( "Existing  urls: {$existing_urls}" );
 	$existing_urls = ! empty( $existing_urls ) ? $existing_urls : array();
 	
 

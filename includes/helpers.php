@@ -149,14 +149,7 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	gform_update_meta( $entry['id'], 's3_urls', $replaced );
 }
 
-add_action('wp_footer' , function(){
 
-	$existing_urls = gform_get_meta( 125, 's3_urls' );
-	
-	$url = s3sync_get_entry_s3_urls(125);
-	
-	var_dump($url);
-});
 /**
  * Retrieves the correct Identity Pool ID.
  * 

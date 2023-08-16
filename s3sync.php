@@ -190,3 +190,4 @@ add_action( 'plugins_loaded', 's3sync_bootstrap', 1 );
 function s3sync_bootstrap() {
 	s3sync();
 }
+

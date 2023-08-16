@@ -7,7 +7,7 @@ use Aws\Exception\AwsException;
  *
  * @param array 	$config 	Client configuration data
  *
- * @return object 	S3Client
+ * @return void 	
  */
 function s3sync_s3_client( $config, $entry = '' ) {
 	S3Sync::autoload();
@@ -30,7 +30,8 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 	// Each form has its own upload path and URL
 	$upload_path = GFFormsModel::get_upload_path( $form_id );
 	$upload_url = GFFormsModel::get_upload_url( $form_id );
-
+	
+	
 	// Loop through these if multi-file upload
 	$files = 0 === strpos( $entry[$field_id], '{' ) || 0 === strpos( $entry[$field_id], '[' ) ? json_decode( $entry[$field_id], true ) : $entry[$field_id];
 
@@ -63,42 +64,26 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 
 	$s3 = s3sync_s3_client( $client_config, $entry );
 
-
 	$files = apply_filters( 's3sync_entry_files', $files, $entry, $form_id );
 
 	do_action( 's3sync_before_entry_upload_to_s3', $entry, $form_id, $files );
-
+	
 	foreach ( $files as $file ) {
-		
+	
 		// Replace the file URL with the file path
 		$file_path = str_replace( $upload_url, $upload_path, $file );
-
+		
 		// Grab the file name
 		$file_parts = explode( '/', $file_path );
 		$file_name = array_pop( $file_parts );
 
-
 		$bucket_name = apply_filters( 's3sync_put_object_bucket_name', $keys['bucket_name'], $file, $file_name, $field_id, $form_id, $entry );
-
-		/**
-		 * File path relative to the bucket.
-		 *
-		 * @since unknown
-		 *
-		 * @param string 	$path 			File path to return. Make sure the path ends with $file_name.
-		 * @param string 	$file 			Local file URL when uploaded
-		 * @param string 	$file_name 		Name of uploaded file
-		 * @param int 		$field_id 		ID of the fileupload field
-		 * @param int 		$form_id 		ID of the form
-		 * @param array 	$entry 			Entry data
-		 */
 
 		// $object_path = apply_filters( 's3sync_put_object_file_path', "form-{$form_id}/{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 		$object_path = apply_filters( 's3sync_put_object_file_path',"form-{$entry['id']}/{$file_name}", $file, $file_name, $field_id, $form_id, $entry );
 
 		$acl = apply_filters( 's3sync_put_object_acl', $keys['acl'], $file, $file_name, $field_id, $form_id, $entry );
 
-		$api_status = [];
 		// Send the file to S3 bucket
 		// https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-s3-2006-03-01.html#putobject
 		try {
@@ -113,9 +98,11 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			), $file, $entry, $form_id );
 			
 			$result = $s3->putObject( $args );
+			
 		} catch (Throwable $e) {
+		
 			error_log( "There was an error uploading the file.\n{$e->getMessage()}" );
-			GFCommon::log_error( " Upload Eror- message: {$e->getMessage()}" );
+			
 			
 		}
 
@@ -138,23 +125,38 @@ function s3sync_send_entry_files_to_s3( $entry, $form_id, $field_id, $keys, $unl
 			
 
 			$s3_urls[$field_id][] = $reference_data;
+			
+			if ( true === $unlink ) {
+				unlink( $file_path );
+			}
 
-			GFCommon::log_error( "Meta array: {$reference_data}" );
+			
 		}
 	}
 
 	$existing_urls = gform_get_meta( $entry['id'], 's3_urls' );
+
 	
-	GFCommon::log_error( "Existing  urls: {$existing_urls}" );
+	
 	$existing_urls = ! empty( $existing_urls ) ? $existing_urls : array();
 	
+	$replaced = array_replace($existing_urls, $s3_urls );
+
 
 	do_action( 's3sync_after_entry_upload_to_s3', $entry, $form_id, $files, $s3_urls );
 
 	// Store the S3 URLs as entry meta
-	return gform_update_meta( $entry['id'], 's3_urls', array_replace( $existing_urls, $s3_urls ) );
+	gform_update_meta( $entry['id'], 's3_urls', $replaced );
 }
 
+add_action('wp_footer' , function(){
+
+	$existing_urls = gform_get_meta( 125, 's3_urls' );
+	
+	$url = s3sync_get_entry_s3_urls(125);
+	
+	var_dump($url);
+});
 /**
  * Retrieves the correct Identity Pool ID.
  * 
@@ -415,7 +417,7 @@ function s3sync_get_aws_endpoint( $form = array(), $field = false ) {
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
  *
- * @return string 	Secret key
+ * @return array 	 
  */
 function s3sync_get_aws_settings( $form = array(), $field = false ) {
 	return array(
@@ -437,7 +439,6 @@ function s3sync_get_aws_settings( $form = array(), $field = false ) {
  * @param  array   	$form  		Form data
  * @param  object 	$field 		Field object
  *
- * @return string 	Secret key
  */
 function s3sync_get_aws_keys( $form = array(), $field = false ) {
 	return s3sync_get_aws_settings( $form, $field );

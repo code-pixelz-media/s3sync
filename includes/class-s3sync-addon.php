@@ -357,7 +357,7 @@ class S3SyncAddon extends GFAddOn {
 			}
 	
 			$settings =  s3sync_get_aws_settings( $form, $field );
-			$uploaded = s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, $settings, $field->amazonS3UnlinkField );
+			s3sync_send_entry_files_to_s3( $entry, $form['id'], $field->id, $settings, $field->amazonS3UnlinkField ); 
 		}
 	}
 
